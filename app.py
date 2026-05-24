@@ -9,7 +9,6 @@ from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-# Cache de dados em memória volátil para o escopo do projeto
 DATA_STORE = {}
 
 def formatar_numero_terminal(valor):
@@ -17,7 +16,6 @@ def formatar_numero_terminal(valor):
     if isinstance(valor, (int, float, np.number)):
         if np.isnan(valor):
             return "—"
-        # Converte para string com formatação americana e depois inverte para o padrão de mercado solicitado
         s_val = f"{valor:,.2f}"
         return s_val.replace(",", "X").replace(".", ",").replace("X", ".")
     return str(valor)
@@ -100,7 +98,7 @@ def home():
                     DATA_STORE['df'] = df
                     DATA_STORE['columns'] = num_cols
                     columns = num_cols
-                    msg = "MATRIZ DE DADOS SUCESSO. SELECIONE A VARIÁVEL ALVO PARA INICIAR COMPILAÇÃO."
+                    msg = "MATRIZ DE DADOS CARREGADA. SELECIONE A VARIÁVEL ALVO PARA EXIBIR OS DADOS."
                 else:
                     msg = "EXCEÇÃO: PLANILHA NÃO CONTÉM VETORES NUMÉRICOS VÁLIDOS."
             except Exception as e:
@@ -114,18 +112,21 @@ def home():
             
             if selected_var in df.columns:
                 try:
-                    # Rendeira a tabela analítica minimalista
+                    # 1. Renderiza a tabela analítica minimalista
                     tables = analisar_coluna_especifica(df, selected_var)
                     
-                    # Desenha o gráfico de dispersão/linha de alta fidelidade
+                    # 2. Desenha o gráfico de linha estável padrão Bloomberg
                     fig = px.line(df, y=selected_var)
+                    
+                    # Correção: customização da linha via update_traces
+                    fig.update_traces(line=dict(color="#2962ff", width=1.5))
+                    
+                    # Layout limpo e compatível com as propriedades válidas do Plotly
                     fig.update_layout(
                         template="plotly_dark",
                         paper_bgcolor="rgba(0,0,0,0)",
                         plot_bgcolor="rgba(0,0,0,0)",
-                        font_family="JetBrains Mono",
-                        font_size=10,
-                        font_color="#b2b5be",
+                        font=dict(family="JetBrains Mono", size=10, color="#b2b5be"),
                         margin=dict(l=40, r=20, t=30, b=40),
                         xaxis=dict(
                             gridcolor="#171921", 
@@ -138,8 +139,7 @@ def home():
                             linecolor="#1e222d", 
                             title=None, 
                             tickfont=dict(color="#63666e")
-                        ),
-                        line=dict(color="#2962ff", width=1.5)
+                        )
                     )
                     graphs.append(json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder))
                     msg = f"ESTATÍSTICAS ATUALIZADAS PARA O ATIVO: {selected_var.upper()}"
