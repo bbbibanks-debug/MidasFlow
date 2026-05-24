@@ -8,43 +8,47 @@
     <script src="https://plot.ly"></script>
     <style>
         @import url('https://googleapis.com');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #1e1e24; color: #a5a6b5; }
-        .dashboard-container { background-color: #13131a; border-radius: 24px; border: 1px solid #23232f; }
-        .card-panel { background-color: #1c1c24; border-radius: 16px; border: 1px solid #282836; }
-        .input-clean { background-color: #252532; border: 1px solid #323246; color: #ffffff; transition: all 0.2s; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0c10; color: #a5a6b5; }
+        .dashboard-container { background-color: #111217; border-radius: 24px; border: 1px solid #1f222e; }
+        .card-panel { background-color: #171921; border-radius: 16px; border: 1px solid #232736; }
+        .stat-box { background-color: #1f222e; border: 1px solid #2d3142; border-radius: 12px; transition: transform 0.15s ease; }
+        .stat-box:hover { transform: translateY(-1px); border-color: #ccff00; }
+        .input-clean { background-color: #1f222e; border: 1px solid #2d3142; color: #ffffff; transition: all 0.2s; }
         .input-clean:focus { border-color: #ccff00; outline: none; }
         .text-lime-neon { color: #ccff00; }
         .bg-lime-neon { background-color: #ccff00; }
-        th, td { border-bottom: 1px solid #252533; }
-        tr:hover { background-color: #23232f; }
     </style>
 </head>
 <body class="p-4 md:p-8 min-h-screen flex items-center justify-center">
 
-    <!-- Container Principal Unificado Sem Menu Lateral -->
     <div class="w-full max-w-6xl dashboard-container p-6 md:p-8 flex flex-col overflow-hidden shadow-2xl">
         
-        <!-- Topbar com Título Principal Único -->
-        <div class="mb-6 flex justify-between items-center">
+        <!-- Topbar -->
+        <div class="mb-6">
             <h1 class="text-white text-xl font-bold tracking-tight">Analytics Dashboard</h1>
         </div>
 
-        <!-- Formulários Superiores Integrados -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <!-- Upload -->
-            <div class="card-panel p-4 flex items-center justify-between">
-                <form action="/" method="POST" enctype="multipart/form-data" class="flex items-center gap-3 w-full">
-                    <input type="file" name="file" accept=".xlsx, .xls" required class="input-clean p-1.5 text-xs rounded-xl flex-1 cursor-pointer file:bg-[#323246] file:border-0 file:text-white file:text-[10px] file:px-2.5 file:py-1 file:rounded-lg file:mr-2">
-                    <button type="submit" class="bg-lime-neon text-black font-bold px-4 py-2 rounded-xl hover:opacity-90 transition-all text-xs tracking-tight">
-                        Upload Sheet
-                    </button>
+        <!-- Seção de Controles Superiores -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            
+            <!-- 1. Widget de Upload Moderno (Drag & Drop Visual) -->
+            <div class="card-panel p-4 flex flex-col justify-center">
+                <form action="/" method="POST" enctype="multipart/form-data" class="w-full">
+                    <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-[#2d3142] rounded-xl cursor-pointer bg-[#14161f] hover:bg-[#1c1f2b] hover:border-[#ccff00] transition-all p-2">
+                        <div class="flex flex-col items-center justify-center pt-2 pb-2">
+                            <p class="text-[11px] text-zinc-400 font-medium mb-1"><span class="text-lime-neon font-bold">Clique para carregar</span> ou arraste a planilha</p>
+                            <p class="text-[9px] text-zinc-500 font-mono">Formatos suportados: .xlsx, .xls</p>
+                        </div>
+                        <input type="file" name="file" accept=".xlsx, .xls" required class="hidden" onchange="this.form.submit()">
+                    </label>
                 </form>
             </div>
 
-            <!-- Filtro -->
+            <!-- Seletor de Variáveis -->
             <div class="card-panel p-4 flex items-center justify-between {% if not columns %}opacity-20 pointer-events-none{% endif %}">
                 <form action="/" method="POST" class="w-full">
-                    <select name="target_variable" required onchange="this.form.submit()" class="input-clean w-full p-2.5 rounded-xl text-xs font-semibold text-white">
+                    <label class="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider mb-2">Selecione o Ativo / Variável</label>
+                    <select name="target_variable" required onchange="this.form.submit()" class="input-clean w-full p-3 rounded-xl text-xs font-semibold text-white cursor-pointer">
                         <option value="">-- CHOOSE VARIABLE TARGET --</option>
                         {% for col in columns %}
                         <option value="{{ col }}" {% if col == selected_var %}selected{% endif %}>{{ col }}</option>
@@ -54,29 +58,46 @@
             </div>
         </div>
 
-        <!-- Mensagens Fluídas do Sistema -->
-        {% if msg %}
-        <div class="p-3 mb-6 bg-[#211f19] border border-amber-500/30 rounded-xl text-amber-400 font-medium text-xs">
-            ⚡ {{ msg }}
-        </div>
-        {% endif %}
-
-        <!-- Visualização Condicional Sob Demanda -->
-        {% if tables and graphs %}
+        <!-- Exibição dos Painéis Modulares em Boxes Harmonizados -->
+        {% if tables_data_c or tables_data_r %}
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-1">
             
-            <!-- Tabela de Estatísticas -->
-            <div class="lg:col-span-5 card-panel p-5">
-                <div class="w-full text-zinc-300 overflow-x-auto">
-                    {{ tables|safe }}
+            <!-- 3. Boxes de Estatísticas -->
+            <div class="lg:col-span-6 flex flex-col gap-6">
+                
+                <!-- Bloco 01: Clássicas -->
+                <div class="card-panel p-5">
+                    <h3 class="text-[10px] uppercase font-bold text-zinc-500 tracking-wider mb-4">// 01. Medidas Clássicas</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        {% for item in tables_data_c %}
+                        <div class="stat-box p-3 flex flex-col justify-between">
+                            <span class="text-[10px] text-zinc-500 font-medium truncate mb-1">{{ item.name }}</span>
+                            <span class="text-xs text-[#00c087] font-bold font-mono tracking-tight">{{ item.value }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
+
+                <!-- Bloco 02: Robustas -->
+                <div class="card-panel p-5">
+                    <h3 class="text-[10px] uppercase font-bold text-[#ff9800] tracking-wider mb-4">// 02. Medidas Robustas e Modificadas</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        {% for item in tables_data_r %}
+                        <div class="stat-box p-3 flex flex-col justify-between">
+                            <span class="text-[10px] text-zinc-500 font-medium truncate mb-1">{{ item.name }}</span>
+                            <span class="text-xs text-lime-neon font-bold font-mono tracking-tight">{{ item.value }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
             </div>
 
-            <!-- Painel do Gráfico Limpo -->
-            <div class="lg:col-span-7 card-panel p-2 bg-[#1c1c24] flex flex-col justify-center">
-                <div class="p-2 bg-[#13131a] rounded-xl flex-1 flex flex-col justify-center min-h-[340px]">
+            <!-- Painel do Gráfico -->
+            <div class="lg:col-span-6 card-panel p-3 flex flex-col h-full min-h-[500px]">
+                <div class="p-2 bg-[#0c0d12] rounded-xl flex-1 flex flex-col justify-center h-full">
                     {% for graph in graphs %}
-                    <div id="graph-{{ loop.index }}" class="w-full h-[320px]"></div>
+                    <div id="graph-{{ loop.index }}" class="w-full h-[460px]"></div>
                     <script>
                         var graphData = {{ graph|safe }};
                         graphData.layout.font.family = "Plus Jakarta Sans";
