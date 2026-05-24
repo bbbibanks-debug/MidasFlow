@@ -11,52 +11,95 @@
         body { font-family: 'Share Tech Mono', monospace; background-color: #0b0c10; color: #00ff66; }
         .bb-border { border: 1px solid #1f2833; }
         .bb-input { background-color: #1f2833; border: 1px solid #45f3ff; color: #45f3ff; }
+        select { background-color: #121214 !important; color: #00ff66 !important; border: 1px solid #1f2833 !important; }
     </style>
 </head>
 <body class="p-6">
     <!-- Header Bloomberg -->
     <header class="bb-border p-3 mb-6 flex justify-between items-center bg-black">
-        <h1 class="text-2xl font-bold tracking-widest text-[#ffb000]">MIDASFLOW v1.0 // DATA_ANALYSIS_TERMINAL</h1>
+        <h1 class="text-2xl font-bold tracking-widest text-[#ffb000]">MIDASFLOW v1.1 // CUSTOM_ANALYSIS_TERMINAL</h1>
         <span class="text-sm text-[#45f3ff]">SYS_STATUS: ONLINE</span>
     </header>
 
-    <!-- Upload Section -->
-    <section class="bb-border p-6 mb-6 bg-black">
-        <h2 class="text-lg mb-4 text-[#45f3ff]">> LOAD_EXCEL_DATA_SHEET:</h2>
-        <form action="/" method="POST" enctype="multipart/form-data" class="flex flex-col sm:flex-row gap-4">
-            <input type="file" name="file" accept=".xlsx, .xls" required class="bb-input p-2 flex-1 rounded cursor-pointer">
-            <button type="submit" class="bg-[#00ff66] text-black font-bold px-6 py-2 rounded hover:bg-[#00cc55] transition-all">
-                EXECUTE_ANALYSIS
-            </button>
-        </form>
-    </section>
+    {% if msg %}
+    <!-- Logs de Sistema -->
+    <div class="bb-border p-2 mb-4 bg-zinc-900 text-xs tracking-wider text-amber-500">
+        >> SYSTEM_LOG: {{ msg }}
+    </div>
+    {% endif %}
+
+    <!-- Grid de Input e Controles -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <!-- Upload Section -->
+        <section class="bb-border p-6 bg-black flex flex-col justify-center">
+            <h2 class="text-lg mb-4 text-[#45f3ff]">> LOAD_EXCEL_DATA_SHEET:</h2>
+            <form action="/" method="POST" enctype="multipart/form-data" class="flex flex-col gap-4">
+                <input type="file" name="file" accept=".xlsx, .xls" required class="bb-input p-2 rounded cursor-pointer text-xs">
+                <button type="submit" class="bg-[#00ff66] text-black font-bold px-6 py-2 rounded hover:bg-[#00cc55] transition-all text-sm tracking-wider">
+                    UPLOAD_AND_MAP
+                </button>
+            </form>
+        </section>
+
+        <!-- Dropdowns Selectors (Apenas visível se houver colunas carregadas) -->
+        <section class="bb-border p-6 bg-black {% if not columns %}opacity-30 pointer-events-none{% endif %}">
+            <h2 class="text-lg mb-4 text-[#ffb000]">> VARIABLES_SELECTOR:</h2>
+            <form action="/" method="POST" class="flex flex-col gap-4">
+                <div>
+                    <label class="block text-xs text-zinc-400 mb-1">AXIS_X (INDEPENDENT_VARIABLE):</label>
+                    <select name="axis_x" required class="w-full p-2 rounded text-sm bb-input">
+                        <option value="">-- SELECT COL --</option>
+                        {% for col in columns %}
+                        <option value="{{ col }}" {% if col == selected_x %}selected{% endif %}>{{ col }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-zinc-400 mb-1">AXIS_Y (DEPENDENT_VARIABLE):</label>
+                    <select name="axis_y" required class="w-full p-2 rounded text-sm bb-input">
+                        <option value="">-- SELECT COL --</option>
+                        {% for col in columns %}
+                        <option value="{{ col }}" {% if col == selected_y %}selected{% endif %}>{{ col }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="bg-[#45f3ff] text-black font-bold px-6 py-2 rounded hover:bg-cyan-400 transition-all text-sm tracking-wider">
+                    RENDER_CUSTOM_GRAPH
+                </button>
+            </form>
+        </section>
+    </div>
 
     {% if tables %}
-    <!-- Results Layout -->
+    <!-- Layout de Resultados -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <!-- Descriptive Stats Table -->
+        <!-- Tabela Estatística -->
         <div class="lg:col-span-1 bb-border p-4 bg-black overflow-x-auto">
             <h3 class="text-md font-bold mb-3 text-[#ffb000]">> DESCRIPTIVE_STATISTICS</h3>
-            <div class="text-xs text-[#00ff66] uppercase">
+            <div class="text-xs uppercase">
                 {{ tables|safe }}
             </div>
         </div>
 
-        <!-- Graphs Section -->
+        <!-- Saída do Gráfico Customizado -->
         <div class="lg:col-span-2 flex flex-col gap-6">
-            {% for graph in graphs %}
-            <div class="bb-border p-4 bg-black">
-                <h3 class="text-md font-bold mb-3 text-[#45f3ff]">> GRAPH_OUTPUT_{{ loop.index }}</h3>
-                <div id="graph-{{ loop.index }}" class="w-full"></div>
-                <script>
-                    var graphData = {{ graph|safe }};
-                    Plotly.newPlot('graph-{{ loop.index }}', graphData.data, graphData.layout, {responsive: true});
-                </script>
-            </div>
-            {% endfor %}
+            {% if graphs %}
+                {% for graph in graphs %}
+                <div class="bb-border p-4 bg-black">
+                    <h3 class="text-md font-bold mb-3 text-[#00ff66]">> DYNAMIC_CHART_OUTPUT</h3>
+                    <div id="graph-{{ loop.index }}" class="w-full"></div>
+                    <script>
+                        var graphData = {{ graph|safe }};
+                        Plotly.newPlot('graph-{{ loop.index }}', graphData.data, graphData.layout, {responsive: true});
+                    </script>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="bb-border p-12 bg-black flex items-center justify-center text-zinc-600 text-sm border-dashed">
+                    AWAITING_VARIABLE_SELECTION...
+                </div>
+            {% endif %}
         </div>
-
     </div>
     {% endif %}
 </body>
