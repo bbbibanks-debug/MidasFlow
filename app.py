@@ -9,18 +9,18 @@ from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
-# Cache de dados em memória volátil
+# Estrutura de persistência interna unificada
 DATA_STORE = {
     'df': None,
     'columns': [],
     'selected_var': None,
-    'tables': None,
-    'graphs': [],
-    'msg': None
+    'tables_data_c': None,
+    'tables_data_r': None,
+    'graphs': []
 }
 
 def formatar_numero_terminal(valor):
-    """Garante formatação uniforme padrão mercado: duas casas decimais com vírgula."""
+    """Formata com precisão padrão do mercado: duas casas decimais e separadores brasileiros."""
     if isinstance(valor, (int, float, np.number)):
         if np.isnan(valor):
             return "—"
@@ -28,46 +28,21 @@ def formatar_numero_terminal(valor):
         return s_val.replace(",", "X").replace(".", ",").replace("X", ".")
     return str(valor)
 
-def gerar_tabela_elegante(metricas_classicas, valores_classicos, metricas_robustas, valores_robustas):
-    """Cria uma estrutura de tabela institucional dividida em categorias."""
-    html = '<div class="space-y-6">'
-    
-    # Bloco 1: Tendência Central Clássica
-    html += '<div>'
-    html += '<h4 class="text-[10px] uppercase font-bold text-zinc-500 tracking-wider mb-2">// 01. Medidas Clássicas</h4>'
-    html += '<table class="w-full text-left border-collapse text-[11px] font-mono font-light tracking-tight">'
-    html += '<tbody>'
-    for k, v in zip(metricas_classicas, valores_classicos):
-        html += f'<tr class="border-b border-[#171921] hover:bg-[#1a1e29]"><td class="py-2 text-zinc-400 font-medium">{k}</td><td class="py-2 text-right text-[#00c087] font-bold">{v}</td></tr>'
-    html += '</tbody></table></div>'
-    
-    # Bloco 2: Tendência Central Robusta e Modificada
-    html += '<div>'
-    html += '<h4 class="text-[10px] uppercase font-bold text-[#ff9800] tracking-wider mb-2">// 02. Medidas Robustas e Modificadas</h4>'
-    html += '<table class="w-full text-left border-collapse text-[11px] font-mono font-light tracking-tight">'
-    html += '<tbody>'
-    for k, v in zip(metricas_robustas, valores_robustas):
-        html += f'<tr class="border-b border-[#171921] hover:bg-[#1a1e29]"><td class="py-2 text-zinc-400 font-medium">{k}</td><td class="py-2 text-right text-lime-neon font-bold">{v}</td></tr>'
-    html += '</tbody></table></div>'
-    
-    html += '</div>'
-    return html
-
-def analisar_coluna_especifica(df, col):
-    """Executa o ecossistema estatístico completo de 16 variáveis."""
+def processar_metricas_lista(df, col):
+    """Calcula todas as 16 métricas e extrai listas de dicionários limpas para os boxes."""
     col_data = df[col].dropna()
     if col_data.empty:
-        return "<span class='text-amber-500 font-mono'>DADOS INSUFICIENTES</span>"
+        return [], []
         
     valores = col_data.to_numpy()
     n = len(valores)
     
-    # --- GRUPO 1: MEDIDAS CLÁSSICAS ---
+    # 01. Medidas Clássicas
     m_aritmetica = np.mean(valores)
     mediana = np.median(valores)
     
     moda_res = stats.mode(valores, keepdims=True)
-    moda = moda_res.mode if len(moda_res.mode) > 0 else "—"
+    moda = moda_res.mode[0] if len(moda_res.mode) > 0 else "—"
     
     ponto_medio = (np.max(valores) + np.min(valores)) / 2
     
@@ -84,7 +59,7 @@ def analisar_coluna_especifica(df, col):
     m_quadratica = np.sqrt(np.mean(valores**2))
     m_cubica = np.cbrt(np.mean(valores**3))
     
-    # --- GRUPO 2: MEDIDAS ROBUSTAS E MODIFICADAS ---
+    # 02. Medidas Robustas e Modificadas
     m_aparada = stats.trim_mean(valores, proportiontocut=0.10)
     
     valores_winsor = stats.mstats.winsorize(valores, limits=[0.05, 0.05]).compressed()
@@ -122,28 +97,28 @@ def analisar_coluna_especifica(df, col):
         moda_geometrica = m_aritmetica
 
     metricas_c = ["Média Aritmética", "Mediana", "Moda", "Ponto Médio", "Média Geométrica", "Média Harmônica", "Média Quadrática", "Média Cúbica"]
-    valores_c = [formatar_numero_terminal(x) for x in [m_aritmetica, mediana, moda, ponto_medio, m_geometrica, m_harmonica, m_quadratica, m_cubica]]
+    valores_c = [m_aritmetica, mediana, moda, ponto_medio, m_geometrica, m_harmonica, m_quadratica, m_cubica]
+    data_c = [{"name": m, "value": formatar_numero_terminal(v)} for m, v in zip(metricas_c, valores_c)]
     
-    metricas_r = ["Média Aparada (10%)", "Média Winsorizada (5%)", "Média Hodges-Lehmann", "Média Ponderada (Rank)", "Média Geom. Winsorizada", "Média Harm. Aparada", "Pseudomediana", "Moda Geométrica (KDE)"]
-    valores_r = [formatar_numero_terminal(x) for x in [m_aparada, m_winsorizada, m_hodges_lehmann, m_ponderada_pop, m_geo_winsor, m_harm_aparada, pseudomediana, moda_geometrica]]
+    metricas_r = ["Média Aparada (10%)", "Média Winsorizada (5%)", "Média Hodges-Lehmann", "Média Ponderada", "Média Geom. Winsorizada", "Média Harm. Aparada", "Pseudomediana", "Moda Geométrica"]
+    valores_r = [m_aparada, m_winsorizada, m_hodges_lehmann, m_ponderada_pop, m_geo_winsor, m_harm_aparada, pseudomediana, moda_geometrica]
+    data_r = [{"name": m, "value": formatar_numero_terminal(v)} for m, v in zip(metricas_r, valores_r)]
     
-    return gerar_tabela_elegante(metricas_c, valores_c, metricas_r, valores_r)
+    return data_c, data_r
 
 @app.route('/', methods=['GET'])
 def home():
     return render_template(
         'index.html', 
-        tables=DATA_STORE['tables'], 
+        tables_data_c=DATA_STORE['tables_data_c'], 
+        tables_data_r=DATA_STORE['tables_data_r'], 
         graphs=DATA_STORE['graphs'], 
         columns=DATA_STORE['columns'], 
-        selected_var=DATA_STORE['selected_var'], 
-        msg=DATA_STORE['msg']
+        selected_var=DATA_STORE['selected_var']
     )
 
 @app.route('/', methods=['POST'])
 def handle_post():
-    DATA_STORE['msg'] = None
-
     if 'file' in request.files and request.files['file'].filename != '':
         file = request.files['file']
         try:
@@ -153,14 +128,12 @@ def handle_post():
             if num_cols:
                 DATA_STORE['df'] = df
                 DATA_STORE['columns'] = num_cols
-                DATA_STORE['tables'] = None
+                DATA_STORE['tables_data_c'] = None
+                DATA_STORE['tables_data_r'] = None
                 DATA_STORE['graphs'] = []
                 DATA_STORE['selected_var'] = None
-                DATA_STORE['msg'] = "PLANILHA PROCESSADA COM SUCESSO. SELECIONE UMA VARIÁVEL ALVO."
-            else:
-                DATA_STORE['msg'] = "EXCEÇÃO: PLANILHA NÃO CONTÉM COLUNAS NUMÉRICAS VÁLIDAS."
-        except Exception as e:
-            DATA_STORE['msg'] = f"FALHA CRÍTICA DE LEITURA: {str(e)}"
+        except Exception:
+            pass
 
     elif 'target_variable' in request.form and DATA_STORE['df'] is not None:
         df = DATA_STORE['df']
@@ -169,10 +142,11 @@ def handle_post():
         if selected_var in df.columns:
             try:
                 DATA_STORE['selected_var'] = selected_var
-                DATA_STORE['tables'] = analisar_coluna_especifica(df, selected_var)
+                dc, dr = processar_metricas_lista(df, selected_var)
+                DATA_STORE['tables_data_c'] = dc
+                DATA_STORE['tables_data_r'] = dr
                 
                 fig = px.line(df, y=selected_var)
-                fig.update_traces(line=dict(color="#ccff00", width=2))
                 fig.update_layout(
                     template="plotly_dark",
                     paper_bgcolor="rgba(0,0,0,0)",
@@ -184,9 +158,8 @@ def handle_post():
                 )
                 
                 DATA_STORE['graphs'] = [json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)]
-                DATA_STORE['msg'] = f"ESTATÍSTICAS ATUALIZADAS PARA: {selected_var.upper()}"
-            except Exception as e:
-                DATA_STORE['msg'] = f"ERRO OPERACIONAL DE COMPILAÇÃO: {str(e)}"
+            except Exception:
+                pass
 
     return redirect(url_for('home'))
 
