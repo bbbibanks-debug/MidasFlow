@@ -3,121 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MIDASFLOW // TERMINAL</title>
+    <title>MIDASFLOW // QUANT_TERMINAL</title>
     <script src="https://tailwindcss.com"></script>
     <script src="https://plot.ly"></script>
     <style>
         @import url('https://googleapis.com');
-        body { font-family: 'JetBrains Mono', monospace; background-color: #0d0e12; color: #d1d4dc; }
-        .panel-border { border: 1px solid #2a2e39; }
-        .bb-input { background-color: #131722; border: 1px solid #363c4e; color: #d1d4dc; }
-        .bb-input:focus { border-color: #2962ff; outline: none; }
-        .tab-active { background-color: #1c2030; border-bottom: 2px solid #2962ff; color: #ffffff; }
-        th, td { border-bottom: 1px solid #1f222e; }
-        tr:hover { background-color: #161a25; }
+        body { font-family: 'JetBrains Mono', monospace; background-color: #0c0d12; color: #b2b5be; letter-spacing: -0.02em; }
+        .border-terminal { border: 1px solid #1e222d; }
+        .bg-panel { background-color: #131722; }
+        .input-terminal { background-color: #1e222d; border: 1px solid #2a2e39; color: #f2f3f5; transition: all 0.2s ease; }
+        .input-terminal:focus { border-color: #2962ff; background-color: #131722; outline: none; }
+        .tab-header { background: linear-gradient(to bottom, #1e222d, #131722); border-bottom: 1px solid #1e222d; }
+        tr { transition: background-color 0.15s ease; }
+        tr:hover { background-color: #1c2030; }
     </style>
 </head>
-<body class="p-4 text-xs">
+<body class="p-6 text-[11px] antialiased">
 
-    <!-- Menu Superior Estilo Terminal -->
-    <header class="flex items-center justify-between border-b border-[#2a2e39] pb-2 mb-4">
-        <div class="flex items-center gap-6 text-zinc-400 font-bold tracking-wider text-[11px]">
-            <span class="text-[#ff9800]">MIDASFLOW</span>
-            <span>MARKETS</span>
-            <span>ANALYTICS</span>
-            <span>PORTFOLIOS</span>
-            <span>SEARCH_TOOLS</span>
+    <!-- Header Estilo Bloomberg Professional -->
+    <header class="flex items-center justify-between border-b border-[#1e222d] pb-3 mb-6 bg-[#0c0d12]">
+        <div class="flex items-center gap-8 font-medium uppercase tracking-wider text-[10px]">
+            <span class="text-[#ff9800] font-bold text-xs tracking-widest">MIDASFLOW</span>
+            <span class="text-zinc-500 cursor-pointer hover:text-zinc-300">Workspace</span>
+            <span class="text-zinc-500 cursor-pointer hover:text-zinc-300">Core_Analytics</span>
+            <span class="text-zinc-500 cursor-pointer hover:text-zinc-300">Data_Stream</span>
         </div>
-        <div class="text-zinc-500 text-[11px]">
-            SYS_STATUS: <span class="text-[#00ff66]">ONLINE</span> // WORKSPACE_01
+        <div class="text-zinc-600 font-mono text-[10px]">
+            PORT: <span class="text-[#2962ff]">SECURE</span> // ENV: <span class="text-[#00c087]">PRODUCTION</span>
         </div>
     </header>
 
-    {% if msg %}
-    <div class="panel-border bg-[#171b26] p-2 mb-4 text-[#ff9800] border-l-4 border-l-[#ff9800]">
-        >> {{ msg }}
-    </div>
-    {% endif %}
+    <!-- Área de Controle Superior Embutida -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <!-- Bloco de Carga -->
+        <div class="border-terminal bg-panel rounded shadow-sm">
+            <div class="tab-header px-4 py-2 font-semibold text-zinc-400 border-b border-[#1e222d] text-[10px] uppercase tracking-wider">
+                >> [ 01 / DATA_LOAD_INTERFACE ]
+            </div>
+            <div class="p-4">
+                <form action="/" method="POST" enctype="multipart/form-data" class="flex items-center gap-3">
+                    <input type="file" name="file" accept=".xlsx, .xls" required class="input-terminal p-1.5 text-[10px] rounded flex-1 cursor-pointer file:bg-[#2a2e39] file:border-0 file:text-white file:text-[10px] file:px-2 file:py-0.5 file:rounded file:mr-2">
+                    <button type="submit" class="bg-[#2962ff] text-white font-semibold px-4 py-1.5 rounded hover:bg-[#1e4bd6] transition-all uppercase tracking-wider text-[10px]">
+                        Execute Load
+                    </button>
+                </form>
+            </div>
+        </div>
 
-    <!-- Seção de Carga de Dados (Upload) -->
-    <section class="panel-border bg-[#131722] mb-4">
-        <div class="flex items-center bg-[#1c2030] px-3 py-1.5 border-b border-[#2a2e39] text-zinc-300 font-bold text-[11px]">
-            <span>[ File Input Workspace ]</span>
-        </div>
-        <div class="p-4">
-            <form action="/" method="POST" enctype="multipart/form-data" class="flex items-center gap-4">
-                <input type="file" name="file" accept=".xlsx, .xls" required class="bb-input p-1.5 text-xs rounded w-64 cursor-pointer">
-                <button type="submit" class="bg-[#2962ff] text-white font-bold px-4 py-1.5 rounded hover:bg-[#1e4bd6] transition-all tracking-wider uppercase text-[11px]">
-                    Load Data Sheet
-                </button>
-            </form>
-        </div>
-    </section>
-
-    <!-- Seletor de Variável Única -->
-    {% if columns %}
-    <section class="panel-border bg-[#131722] mb-4">
-        <div class="flex items-center bg-[#1c2030] px-3 py-1.5 border-b border-[#2a2e39] text-[#ff9800] font-bold text-[11px]">
-            <span>[ Variable Selection Control ]</span>
-        </div>
-        <div class="p-4">
-            <form action="/" method="POST" class="flex items-center gap-4">
-                <div class="flex items-center gap-2">
-                    <label class="text-zinc-400">SELECT TARGET VARIABLE:</label>
-                    <select name="target_variable" required onchange="this.form.submit()" class="bb-input p-1.5 rounded text-xs min-w-[200px] text-white">
-                        <option value="">-- SELECT COLUMN --</option>
+        <!-- Bloco de Seleção Dinâmica -->
+        <div class="border-terminal bg-panel rounded shadow-sm {% if not columns %}opacity-20 pointer-events-none{% endif %}">
+            <div class="tab-header px-4 py-2 font-semibold text-[#ff9800] border-b border-[#1e222d] text-[10px] uppercase tracking-wider">
+                >> [ 02 / VARIABLE_FILTER_CONTROL ]
+            </div>
+            <div class="p-4">
+                <form action="/" method="POST" class="flex items-center gap-3">
+                    <select name="target_variable" required onchange="this.form.submit()" class="input-terminal w-full p-2 rounded text-[11px] text-white font-medium">
+                        <option value="">-- AWAITING COLUMN SELECTION --</option>
                         {% for col in columns %}
                         <option value="{{ col }}" {% if col == selected_var %}selected{% endif %}>{{ col }}</option>
                         {% endfor %}
                     </select>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
-    </section>
+    </div>
+
+    <!-- Painel de Logs de Operação Fluida -->
+    {% if msg %}
+    <div class="border-terminal bg-[#141210] p-2.5 mb-6 rounded text-[#ff9800] font-mono text-[10px] flex items-center gap-2 border-l-2 border-l-[#ff9800]">
+        <span class="animate-pulse">●</span> SYS_LOG_OUTPUT // {{ msg }}
+    </div>
     {% endif %}
 
-    <!-- Grid Principal de Análise (Estilo Imagem Anexa) -->
-    {% if tables or graphs %}
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+    <!-- Apresentação dos Dados Apenas sob Demanda ReAL (Quando Selecionado) -->
+    {% if tables and graphs %}
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        <!-- Painel de Estatísticas Descritivas -->
-        <div class="lg:col-span-4 panel-border bg-[#131722] flex flex-col">
-            <div class="flex bg-[#131722] border-b border-[#2a2e39]">
-                <div class="tab-active px-4 py-2 font-bold text-[11px] uppercase tracking-wider">[ Summary Stats ]</div>
-                <div class="text-zinc-600 px-4 py-2 text-[11px]">Output View</div>
+        <!-- Módulo de Estatísticas Descritivas -->
+        <div class="lg:col-span-4 border-terminal bg-panel rounded shadow-md overflow-hidden">
+            <div class="tab-header px-4 py-2.5 flex justify-between items-center border-b border-[#1e222d]">
+                <span class="font-bold text-white uppercase tracking-wider text-[10px]">[ Metric Analytics ]</span>
+                <span class="text-zinc-600 font-mono text-[9px]">Matrix Matrix_v1</span>
             </div>
-            <div class="p-4 overflow-x-auto flex-1">
-                <h3 class="text-zinc-400 font-bold mb-4 text-[#ff9800] uppercase">>> Variable: {{ selected_var }}</h3>
-                <div class="w-full text-zinc-300">
+            <div class="p-5">
+                <div class="mb-4 pb-2 border-b border-[#1e222d] flex justify-between items-center">
+                    <span class="text-zinc-500 font-medium">Target Metric Focus:</span>
+                    <span class="text-[#ff9800] font-bold text-xs font-mono tracking-tight">{{ selected_var }}</span>
+                </div>
+                <div class="w-full text-zinc-300 font-mono">
                     {{ tables|safe }}
                 </div>
             </div>
         </div>
 
-        <!-- Painel de Gráficos de Alta Precisão -->
-        <div class="lg:col-span-8 panel-border bg-[#131722] flex flex-col">
-            <div class="flex bg-[#131722] border-b border-[#2a2e39]">
-                <div class="tab-active px-4 py-2 font-bold text-[11px] uppercase tracking-wider">[ Analytics Plot ]</div>
-                <div class="text-zinc-600 px-4 py-2 text-[11px]">Interactive View</div>
+        <!-- Módulo de Gráficos e Projeções Computacionais -->
+        <div class="lg:col-span-8 border-terminal bg-panel rounded shadow-md overflow-hidden flex flex-col">
+            <div class="tab-header px-4 py-2.5 flex justify-between items-center border-b border-[#1e222d]">
+                <span class="font-bold text-[#00c087] uppercase tracking-wider text-[10px]">[ Visual Data Streaming ]</span>
+                <span class="text-zinc-600 font-mono text-[9px]">High_Fidelity_Render</span>
             </div>
-            <div class="p-4 flex-1 flex flex-col justify-center bg-[#0d0e12]">
-                {% if graphs %}
-                    {% for graph in graphs %}
-                    <div id="graph-{{ loop.index }}" class="w-full h-[380px]"></div>
-                    <script>
-                        var graphData = {{ graph|safe }};
-                        Plotly.newPlot('graph-{{ loop.index }}', graphData.data, graphData.layout, {responsive: true, displayModeBar: false});
-                    </script>
-                    {% endfor %}
-                {% else %}
-                    <div class="text-zinc-600 text-center py-20 border border-dashed border-[#2a2e39] m-4 rounded">
-                        AWAITING VARIABLE EXPLORATION EXECUTION...
-                    </div>
-                {% endif %}
+            <div class="p-4 bg-[#0c0d12] flex-1 flex flex-col justify-center min-h-[415px]">
+                {% for graph in graphs %}
+                <div id="graph-{{ loop.index }}" class="w-full h-[385px]"></div>
+                <script>
+                    var graphData = {{ graph|safe }};
+                    Plotly.newPlot('graph-{{ loop.index }}', graphData.data, graphData.layout, {responsive: true, displayModeBar: false});
+                </script>
+                {% endfor %}
             </div>
         </div>
 
     </div>
+    {% else %}
+        <!-- Estado de Repouso Elegante: Só exibe quando vazio -->
+        <div class="border-terminal border-dashed p-16 text-center text-zinc-600 rounded bg-[#0c0d12] font-mono tracking-wide mt-12 flex flex-col items-center justify-center gap-2">
+            <div class="text-xs text-zinc-500 font-bold uppercase tracking-widest">// CRITICAL_SYSTEM_IDLE</div>
+            <div class="text-[10px]">AWAITING FILE INGESTION AND VARIABLE SELECTION TO COMPILE COMPUTATIONAL STATISTICS</div>
+        </div>
     {% endif %}
     
 </body>
