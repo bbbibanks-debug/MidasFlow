@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MIDASFLOW // DASHBOARD</title>
+    <title>MIDASFLOW</title>
     <script src="https://tailwindcss.com"></script>
     <script src="https://plot.ly"></script>
     <style>
         @import url('https://googleapis.com');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #1e1e24; color: #a5a6b5; }
         .dashboard-container { background-color: #13131a; border-radius: 24px; border: 1px solid #23232f; }
-        .sidebar { border-right: 1px solid #1c1c27; }
         .card-panel { background-color: #1c1c24; border-radius: 16px; border: 1px solid #282836; }
         .input-clean { background-color: #252532; border: 1px solid #323246; color: #ffffff; transition: all 0.2s; }
         .input-clean:focus { border-color: #ccff00; outline: none; }
@@ -22,144 +21,82 @@
 </head>
 <body class="p-4 md:p-8 min-h-screen flex items-center justify-center">
 
-    <!-- Container Principal (Estilo App da Imagem) -->
-    <div class="w-full max-w-7xl dashboard-container min-h-[85vh] flex flex-col md:flex-row overflow-hidden shadow-2xl">
+    <!-- Container Principal Unificado Sem Menu Lateral -->
+    <div class="w-full max-w-6xl dashboard-container p-6 md:p-8 flex flex-col overflow-hidden shadow-2xl">
         
-        <!-- Barra Lateral de Navegação (Sidebar) -->
-        <aside class="w-full md:w-64 sidebar p-6 flex flex-col justify-between bg-[#111117]">
-            <div>
-                <!-- Perfil -->
-                <div class="flex flex-col items-center text-center my-6">
-                    <div class="w-16 h-16 rounded-full border-2 border-[#ccff00] p-1 flex items-center justify-center mb-3">
-                        <div class="w-full h-full bg-[#1c1c24] rounded-full flex items-center justify-center text-white text-xl font-bold">M</div>
-                    </div>
-                    <h2 class="text-white font-semibold text-sm tracking-wide">MidasFlow App</h2>
-                    <span class="text-xs text-zinc-500">Workspace Actived</span>
-                </div>
+        <!-- Topbar com Título Principal Único -->
+        <div class="mb-6 flex justify-between items-center">
+            <h1 class="text-white text-xl font-bold tracking-tight">Analytics Dashboard</h1>
+        </div>
 
-                <!-- Itens do Menu -->
-                <nav class="space-y-2 mt-8 text-xs font-medium">
-                    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white bg-[#1c1c24] border border-[#282836] transition-all">
-                        <span class="text-lime-neon">■</span> Dashboard
-                    </a>
-                    <div class="opacity-40 space-y-2">
-                        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#1c1c24] transition-all"><span>○</span> Task manager</a>
-                        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#1c1c24] transition-all"><span>○</span> Admin Matrix</a>
-                        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#1c1c24] transition-all"><span>○</span> Messages</a>
-                        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#1c1c24] transition-all"><span>○</span> Settings</a>
-                    </div>
-                </nav>
+        <!-- Formulários Superiores Integrados -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <!-- Upload -->
+            <div class="card-panel p-4 flex items-center justify-between">
+                <form action="/" method="POST" enctype="multipart/form-data" class="flex items-center gap-3 w-full">
+                    <input type="file" name="file" accept=".xlsx, .xls" required class="input-clean p-1.5 text-xs rounded-xl flex-1 cursor-pointer file:bg-[#323246] file:border-0 file:text-white file:text-[10px] file:px-2.5 file:py-1 file:rounded-lg file:mr-2">
+                    <button type="submit" class="bg-lime-neon text-black font-bold px-4 py-2 rounded-xl hover:opacity-90 transition-all text-xs tracking-tight">
+                        Upload Sheet
+                    </button>
+                </form>
             </div>
 
-            <!-- Botão de Sair Embaixo -->
-            <div class="opacity-50 pt-4 border-t border-[#1c1c27] text-xs">
-                <a href="/" class="flex items-center gap-3 px-4 py-2 rounded-xl text-red-400 hover:bg-red-950/20 transition-all">
-                    <span>➔</span> Reset System
-                </a>
-            </div>
-        </aside>
-
-        <!-- Painel de Conteúdo Principal -->
-        <main class="flex-1 p-6 md:p-8 flex flex-col justify-between">
-            
-            <!-- Topbar interna: Inputs -->
-            <div class="mb-8">
-                <div class="flex justify-between items-center mb-6">
-                    <div>
-                        <h1 class="text-white text-xl font-bold tracking-tight">Analytics Dashboard</h1>
-                        <p class="text-zinc-500 text-xs font-medium">MidasFlow Core Real-time Engine</p>
-                    </div>
-                    <div class="text-[11px] font-mono px-3 py-1 bg-[#1c1c24] border border-[#282836] rounded-lg text-lime-neon">
-                        STATUS // ONLINE
-                    </div>
-                </div>
-
-                <!-- Formulários Integrados Limpos -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Upload -->
-                    <div class="card-panel p-4 flex items-center justify-between">
-                        <form action="/" method="POST" enctype="multipart/form-data" class="flex items-center gap-3 w-full">
-                            <input type="file" name="file" accept=".xlsx, .xls" required class="input-clean p-1.5 text-xs rounded-xl flex-1 cursor-pointer file:bg-[#323246] file:border-0 file:text-white file:text-[10px] file:px-2.5 file:py-1 file:rounded-lg file:mr-2">
-                            <button type="submit" class="bg-lime-neon text-black font-bold px-4 py-2 rounded-xl hover:opacity-90 transition-all text-xs tracking-tight">
-                                Upload Sheet
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- Filtro -->
-                    <div class="card-panel p-4 flex items-center justify-between {% if not columns %}opacity-20 pointer-events-none{% endif %}">
-                        <form action="/" method="POST" class="w-full">
-                            <select name="target_variable" required onchange="this.form.submit()" class="input-clean w-full p-2.5 rounded-xl text-xs font-semibold text-white">
-                                <option value="">-- CHOOSE VARIABLE TARGET --</option>
-                                {% for col in columns %}
-                                <option value="{{ col }}" {% if col == selected_var %}selected{% endif %}>{{ col }}</option>
-                                {% endfor %}
-                            </select>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Logs Fluídos -->
-            {% if msg %}
-            <div class="p-3 mb-6 bg-[#211f19] border border-amber-500/30 rounded-xl text-amber-400 font-medium text-xs flex items-center gap-2">
-                <span>⚡</span> {{ msg }}
-            </div>
-            {% endif %}
-
-            <!-- Visualização Condicional Sob Demanda -->
-            {% if tables and graphs %}
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-1">
-                
-                <!-- Tabela de Dados Simplificada -->
-                <div class="lg:col-span-5 card-panel p-5 flex flex-col h-full justify-between">
-                    <div>
-                        <div class="flex justify-between items-center mb-4 pb-2 border-b border-[#252533]">
-                            <span class="text-white font-bold text-xs uppercase tracking-wider text-lime-neon">Descriptive Analysis</span>
-                            <span class="text-[10px] bg-[#252532] px-2 py-0.5 rounded text-zinc-400 font-mono">{{ selected_var[:15] }}...</span>
-                        </div>
-                        <div class="w-full text-zinc-300 overflow-x-auto">
-                            {{ tables|safe }}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Gráfico Premium Clean -->
-                <div class="lg:col-span-7 card-panel p-4 bg-[#1c1c24] h-full flex flex-col justify-center">
-                    <div class="flex justify-between items-center mb-2 px-2">
-                        <span class="text-white font-bold text-xs uppercase tracking-wider text-zinc-400">Sequence Trendline</span>
-                    </div>
-                    <div class="p-2 bg-[#13131a] rounded-xl flex-1 flex flex-col justify-center min-h-[340px]">
-                        {% for graph in graphs %}
-                        <div id="graph-{{ loop.index }}" class="w-full h-[320px]"></div>
-                        <script>
-                            var graphData = {{ graph|safe }};
-                            // Customização forçada via JS para bater 100% com o tema verde limão
-                            graphData.layout.font.family = "Plus Jakarta Sans";
-                            graphData.layout.font.color = "#a5a6b5";
-                            if(graphData.data[0]) {
-                                graphData.data[0].line.color = "#ccff00";
-                                graphData.data[0].line.width = 3;
-                            }
-                            Plotly.newPlot('graph-{{ loop.index }}', graphData.data, graphData.layout, {responsive: true, displayModeBar: false});
-                        </script>
+            <!-- Filtro -->
+            <div class="card-panel p-4 flex items-center justify-between {% if not columns %}opacity-20 pointer-events-none{% endif %}">
+                <form action="/" method="POST" class="w-full">
+                    <select name="target_variable" required onchange="this.form.submit()" class="input-clean w-full p-2.5 rounded-xl text-xs font-semibold text-white">
+                        <option value="">-- CHOOSE VARIABLE TARGET --</option>
+                        {% for col in columns %}
+                        <option value="{{ col }}" {% if col == selected_var %}selected{% endif %}>{{ col }}</option>
                         {% endfor %}
-                    </div>
-                </div>
-
+                    </select>
+                </form>
             </div>
-            {% else %}
-                <!-- Interface Vazia Minimalista Inicial -->
-                <div class="border-2 border-dashed border-[#282836] p-12 text-center rounded-2xl bg-[#13131a] flex-1 flex flex-col items-center justify-center gap-3 my-auto">
-                    <div class="text-2xl text-lime-neon font-light">○</div>
-                    <div class="text-xs text-white font-semibold uppercase tracking-wider">System Idle Environment</div>
-                    <div class="text-[11px] text-zinc-500 max-w-sm mx-auto leading-relaxed">
-                        Please upload your spreadsheet and select a data sequence column above to activate computation panels.
-                    </div>
-                </div>
-            {% endif %}
+        </div>
+
+        <!-- Visualização Condicional Sob Demanda -->
+        {% if tables and graphs %}
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-1">
             
-        </main>
+            <!-- Tabela de Estatísticas -->
+            <div class="lg:col-span-5 card-panel p-5">
+                <div class="w-full text-zinc-300 overflow-x-auto">
+                    {{ tables|safe }}
+                </div>
+            </div>
+
+            <!-- Painel do Gráfico Limpo -->
+            <div class="lg:col-span-7 card-panel p-2 bg-[#1c1c24] flex flex-col justify-center">
+                <div class="p-2 bg-[#13131a] rounded-xl flex-1 flex flex-col justify-center min-h-[340px]">
+                    {% for graph in graphs %}
+                    <div id="graph-{{ loop.index }}" class="w-full h-[320px]"></div>
+                    <script>
+                        var graphData = {{ graph|safe }};
+                        graphData.layout.font.family = "Plus Jakarta Sans";
+                        graphData.layout.font.color = "#a5a6b5";
+                        if(graphData.data && graphData.data[0]) {
+                            graphData.data[0].line = {
+                                color: "#ccff00",
+                                width: 2.5
+                            };
+                        }
+                        Plotly.newPlot('graph-{{ loop.index }}', graphData.data, graphData.layout, {responsive: true, displayModeBar: false});
+                    </script>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+        {% else %}
+            <!-- Estado Inicial de Repouso Totalmente Limpo -->
+            <div class="border-2 border-dashed border-[#282836] p-12 text-center rounded-2xl bg-[#13131a] flex-1 flex flex-col items-center justify-center gap-2 mt-4">
+                <div class="text-xs text-zinc-500 font-semibold uppercase tracking-wider">Awaiting Data Ingestion</div>
+                <div class="text-[11px] text-zinc-600 max-w-xs mx-auto">
+                    Please upload your spreadsheet and select a data column above to begin computations.
+                </div>
+            </div>
+        {% endif %}
+        
     </div>
 
 </body>
