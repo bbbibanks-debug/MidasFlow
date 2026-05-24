@@ -3,124 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MIDASFLOW // QUANT_TERMINAL</title>
+    <title>MIDASFLOW // DASHBOARD</title>
     <script src="https://tailwindcss.com"></script>
     <script src="https://plot.ly"></script>
     <style>
         @import url('https://googleapis.com');
-        body { font-family: 'JetBrains Mono', monospace; background-color: #0c0d12; color: #b2b5be; letter-spacing: -0.02em; }
-        .border-terminal { border: 1px solid #1e222d; }
-        .bg-panel { background-color: #131722; }
-        .input-terminal { background-color: #1e222d; border: 1px solid #2a2e39; color: #f2f3f5; transition: all 0.2s ease; }
-        .input-terminal:focus { border-color: #2962ff; background-color: #131722; outline: none; }
-        .tab-header { background: linear-gradient(to bottom, #1e222d, #131722); border-bottom: 1px solid #1e222d; }
-        tr { transition: background-color 0.15s ease; }
-        tr:hover { background-color: #1c2030; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #1e1e24; color: #a5a6b5; }
+        .dashboard-container { background-color: #13131a; border-radius: 24px; border: 1px solid #23232f; }
+        .sidebar { border-right: 1px solid #1c1c27; }
+        .card-panel { background-color: #1c1c24; border-radius: 16px; border: 1px solid #282836; }
+        .input-clean { background-color: #252532; border: 1px solid #323246; color: #ffffff; transition: all 0.2s; }
+        .input-clean:focus { border-color: #ccff00; outline: none; }
+        .text-lime-neon { color: #ccff00; }
+        .bg-lime-neon { background-color: #ccff00; }
+        th, td { border-bottom: 1px solid #252533; }
+        tr:hover { background-color: #23232f; }
     </style>
 </head>
-<body class="p-6 text-[11px] antialiased">
+<body class="p-4 md:p-8 min-h-screen flex items-center justify-center">
 
-    <!-- Header Estilo Bloomberg Professional -->
-    <header class="flex items-center justify-between border-b border-[#1e222d] pb-3 mb-6 bg-[#0c0d12]">
-        <div class="flex items-center gap-8 font-medium uppercase tracking-wider text-[10px]">
-            <span class="text-[#ff9800] font-bold text-xs tracking-widest">MIDASFLOW</span>
-            <span class="text-zinc-500 cursor-pointer hover:text-zinc-300">Workspace</span>
-            <span class="text-zinc-500 cursor-pointer hover:text-zinc-300">Core_Analytics</span>
-            <span class="text-zinc-500 cursor-pointer hover:text-zinc-300">Data_Stream</span>
-        </div>
-        <div class="text-zinc-600 font-mono text-[10px]">
-            PORT: <span class="text-[#2962ff]">SECURE</span> // ENV: <span class="text-[#00c087]">PRODUCTION</span>
-        </div>
-    </header>
-
-    <!-- Área de Controle Superior Embutida -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <!-- Bloco de Carga -->
-        <div class="border-terminal bg-panel rounded shadow-sm">
-            <div class="tab-header px-4 py-2 font-semibold text-zinc-400 border-b border-[#1e222d] text-[10px] uppercase tracking-wider">
-                >> [ 01 / DATA_LOAD_INTERFACE ]
-            </div>
-            <div class="p-4">
-                <form action="/" method="POST" enctype="multipart/form-data" class="flex items-center gap-3">
-                    <input type="file" name="file" accept=".xlsx, .xls" required class="input-terminal p-1.5 text-[10px] rounded flex-1 cursor-pointer file:bg-[#2a2e39] file:border-0 file:text-white file:text-[10px] file:px-2 file:py-0.5 file:rounded file:mr-2">
-                    <button type="submit" class="bg-[#2962ff] text-white font-semibold px-4 py-1.5 rounded hover:bg-[#1e4bd6] transition-all uppercase tracking-wider text-[10px]">
-                        Execute Load
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Bloco de Seleção Dinâmica -->
-        <div class="border-terminal bg-panel rounded shadow-sm {% if not columns %}opacity-20 pointer-events-none{% endif %}">
-            <div class="tab-header px-4 py-2 font-semibold text-[#ff9800] border-b border-[#1e222d] text-[10px] uppercase tracking-wider">
-                >> [ 02 / VARIABLE_FILTER_CONTROL ]
-            </div>
-            <div class="p-4">
-                <form action="/" method="POST" class="flex items-center gap-3">
-                    <select name="target_variable" required onchange="this.form.submit()" class="input-terminal w-full p-2 rounded text-[11px] text-white font-medium">
-                        <option value="">-- AWAITING COLUMN SELECTION --</option>
-                        {% for col in columns %}
-                        <option value="{{ col }}" {% if col == selected_var %}selected{% endif %}>{{ col }}</option>
-                        {% endfor %}
-                    </select>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Painel de Logs de Operação Fluida -->
-    {% if msg %}
-    <div class="border-terminal bg-[#141210] p-2.5 mb-6 rounded text-[#ff9800] font-mono text-[10px] flex items-center gap-2 border-l-2 border-l-[#ff9800]">
-        <span class="animate-pulse">●</span> SYS_LOG_OUTPUT // {{ msg }}
-    </div>
-    {% endif %}
-
-    <!-- Apresentação dos Dados Apenas sob Demanda ReAL (Quando Selecionado) -->
-    {% if tables and graphs %}
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <!-- Container Principal (Estilo App da Imagem) -->
+    <div class="w-full max-w-7xl dashboard-container min-h-[85vh] flex flex-col md:flex-row overflow-hidden shadow-2xl">
         
-        <!-- Módulo de Estatísticas Descritivas -->
-        <div class="lg:col-span-4 border-terminal bg-panel rounded shadow-md overflow-hidden">
-            <div class="tab-header px-4 py-2.5 flex justify-between items-center border-b border-[#1e222d]">
-                <span class="font-bold text-white uppercase tracking-wider text-[10px]">[ Metric Analytics ]</span>
-                <span class="text-zinc-600 font-mono text-[9px]">Matrix Matrix_v1</span>
-            </div>
-            <div class="p-5">
-                <div class="mb-4 pb-2 border-b border-[#1e222d] flex justify-between items-center">
-                    <span class="text-zinc-500 font-medium">Target Metric Focus:</span>
-                    <span class="text-[#ff9800] font-bold text-xs font-mono tracking-tight">{{ selected_var }}</span>
+        <!-- Barra Lateral de Navegação (Sidebar) -->
+        <aside class="w-full md:w-64 sidebar p-6 flex flex-col justify-between bg-[#111117]">
+            <div>
+                <!-- Perfil -->
+                <div class="flex flex-col items-center text-center my-6">
+                    <div class="w-16 h-16 rounded-full border-2 border-[#ccff00] p-1 flex items-center justify-center mb-3">
+                        <div class="w-full h-full bg-[#1c1c24] rounded-full flex items-center justify-center text-white text-xl font-bold">M</div>
+                    </div>
+                    <h2 class="text-white font-semibold text-sm tracking-wide">MidasFlow App</h2>
+                    <span class="text-xs text-zinc-500">Workspace Actived</span>
                 </div>
-                <div class="w-full text-zinc-300 font-mono">
-                    {{ tables|safe }}
+
+                <!-- Itens do Menu -->
+                <nav class="space-y-2 mt-8 text-xs font-medium">
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl text-white bg-[#1c1c24] border border-[#282836] transition-all">
+                        <span class="text-lime-neon">■</span> Dashboard
+                    </a>
+                    <div class="opacity-40 space-y-2">
+                        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#1c1c24] transition-all"><span>○</span> Task manager</a>
+                        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#1c1c24] transition-all"><span>○</span> Admin Matrix</a>
+                        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#1c1c24] transition-all"><span>○</span> Messages</a>
+                        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#1c1c24] transition-all"><span>○</span> Settings</a>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Botão de Sair Embaixo -->
+            <div class="opacity-50 pt-4 border-t border-[#1c1c27] text-xs">
+                <a href="/" class="flex items-center gap-3 px-4 py-2 rounded-xl text-red-400 hover:bg-red-950/20 transition-all">
+                    <span>➔</span> Reset System
+                </a>
+            </div>
+        </aside>
+
+        <!-- Painel de Conteúdo Principal -->
+        <main class="flex-1 p-6 md:p-8 flex flex-col justify-between">
+            
+            <!-- Topbar interna: Inputs -->
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 class="text-white text-xl font-bold tracking-tight">Analytics Dashboard</h1>
+                        <p class="text-zinc-500 text-xs font-medium">MidasFlow Core Real-time Engine</p>
+                    </div>
+                    <div class="text-[11px] font-mono px-3 py-1 bg-[#1c1c24] border border-[#282836] rounded-lg text-lime-neon">
+                        STATUS // ONLINE
+                    </div>
+                </div>
+
+                <!-- Formulários Integrados Limpos -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Upload -->
+                    <div class="card-panel p-4 flex items-center justify-between">
+                        <form action="/" method="POST" enctype="multipart/form-data" class="flex items-center gap-3 w-full">
+                            <input type="file" name="file" accept=".xlsx, .xls" required class="input-clean p-1.5 text-xs rounded-xl flex-1 cursor-pointer file:bg-[#323246] file:border-0 file:text-white file:text-[10px] file:px-2.5 file:py-1 file:rounded-lg file:mr-2">
+                            <button type="submit" class="bg-lime-neon text-black font-bold px-4 py-2 rounded-xl hover:opacity-90 transition-all text-xs tracking-tight">
+                                Upload Sheet
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Filtro -->
+                    <div class="card-panel p-4 flex items-center justify-between {% if not columns %}opacity-20 pointer-events-none{% endif %}">
+                        <form action="/" method="POST" class="w-full">
+                            <select name="target_variable" required onchange="this.form.submit()" class="input-clean w-full p-2.5 rounded-xl text-xs font-semibold text-white">
+                                <option value="">-- CHOOSE VARIABLE TARGET --</option>
+                                {% for col in columns %}
+                                <option value="{{ col }}" {% if col == selected_var %}selected{% endif %}>{{ col }}</option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Módulo de Gráficos e Projeções Computacionais -->
-        <div class="lg:col-span-8 border-terminal bg-panel rounded shadow-md overflow-hidden flex flex-col">
-            <div class="tab-header px-4 py-2.5 flex justify-between items-center border-b border-[#1e222d]">
-                <span class="font-bold text-[#00c087] uppercase tracking-wider text-[10px]">[ Visual Data Streaming ]</span>
-                <span class="text-zinc-600 font-mono text-[9px]">High_Fidelity_Render</span>
+            <!-- Logs Fluídos -->
+            {% if msg %}
+            <div class="p-3 mb-6 bg-[#211f19] border border-amber-500/30 rounded-xl text-amber-400 font-medium text-xs flex items-center gap-2">
+                <span>⚡</span> {{ msg }}
             </div>
-            <div class="p-4 bg-[#0c0d12] flex-1 flex flex-col justify-center min-h-[415px]">
-                {% for graph in graphs %}
-                <div id="graph-{{ loop.index }}" class="w-full h-[385px]"></div>
-                <script>
-                    var graphData = {{ graph|safe }};
-                    Plotly.newPlot('graph-{{ loop.index }}', graphData.data, graphData.layout, {responsive: true, displayModeBar: false});
-                </script>
-                {% endfor %}
-            </div>
-        </div>
+            {% endif %}
 
+            <!-- Visualização Condicional Sob Demanda -->
+            {% if tables and graphs %}
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-1">
+                
+                <!-- Tabela de Dados Simplificada -->
+                <div class="lg:col-span-5 card-panel p-5 flex flex-col h-full justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4 pb-2 border-b border-[#252533]">
+                            <span class="text-white font-bold text-xs uppercase tracking-wider text-lime-neon">Descriptive Analysis</span>
+                            <span class="text-[10px] bg-[#252532] px-2 py-0.5 rounded text-zinc-400 font-mono">{{ selected_var[:15] }}...</span>
+                        </div>
+                        <div class="w-full text-zinc-300 overflow-x-auto">
+                            {{ tables|safe }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico Premium Clean -->
+                <div class="lg:col-span-7 card-panel p-4 bg-[#1c1c24] h-full flex flex-col justify-center">
+                    <div class="flex justify-between items-center mb-2 px-2">
+                        <span class="text-white font-bold text-xs uppercase tracking-wider text-zinc-400">Sequence Trendline</span>
+                    </div>
+                    <div class="p-2 bg-[#13131a] rounded-xl flex-1 flex flex-col justify-center min-h-[340px]">
+                        {% for graph in graphs %}
+                        <div id="graph-{{ loop.index }}" class="w-full h-[320px]"></div>
+                        <script>
+                            var graphData = {{ graph|safe }};
+                            // Customização forçada via JS para bater 100% com o tema verde limão
+                            graphData.layout.font.family = "Plus Jakarta Sans";
+                            graphData.layout.font.color = "#a5a6b5";
+                            if(graphData.data[0]) {
+                                graphData.data[0].line.color = "#ccff00";
+                                graphData.data[0].line.width = 3;
+                            }
+                            Plotly.newPlot('graph-{{ loop.index }}', graphData.data, graphData.layout, {responsive: true, displayModeBar: false});
+                        </script>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+            {% else %}
+                <!-- Interface Vazia Minimalista Inicial -->
+                <div class="border-2 border-dashed border-[#282836] p-12 text-center rounded-2xl bg-[#13131a] flex-1 flex flex-col items-center justify-center gap-3 my-auto">
+                    <div class="text-2xl text-lime-neon font-light">○</div>
+                    <div class="text-xs text-white font-semibold uppercase tracking-wider">System Idle Environment</div>
+                    <div class="text-[11px] text-zinc-500 max-w-sm mx-auto leading-relaxed">
+                        Please upload your spreadsheet and select a data sequence column above to activate computation panels.
+                    </div>
+                </div>
+            {% endif %}
+            
+        </main>
     </div>
-    {% else %}
-        <!-- Estado de Repouso Elegante: Só exibe quando vazio -->
-        <div class="border-terminal border-dashed p-16 text-center text-zinc-600 rounded bg-[#0c0d12] font-mono tracking-wide mt-12 flex flex-col items-center justify-center gap-2">
-            <div class="text-xs text-zinc-500 font-bold uppercase tracking-widest">// CRITICAL_SYSTEM_IDLE</div>
-            <div class="text-[10px]">AWAITING FILE INGESTION AND VARIABLE SELECTION TO COMPILE COMPUTATIONAL STATISTICS</div>
-        </div>
-    {% endif %}
-    
+
 </body>
 </html>
