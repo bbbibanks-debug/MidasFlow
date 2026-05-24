@@ -54,6 +54,13 @@
             </div>
         </div>
 
+        <!-- Mensagens Fluídas do Sistema -->
+        {% if msg %}
+        <div class="p-3 mb-6 bg-[#211f19] border border-amber-500/30 rounded-xl text-amber-400 font-medium text-xs">
+            ⚡ {{ msg }}
+        </div>
+        {% endif %}
+
         <!-- Visualização Condicional Sob Demanda -->
         {% if tables and graphs %}
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-1">
@@ -87,14 +94,6 @@
             </div>
 
         </div>
-        {% else %}
-            <!-- Estado Inicial de Repouso Totalmente Limpo -->
-            <div class="border-2 border-dashed border-[#282836] p-12 text-center rounded-2xl bg-[#13131a] flex-1 flex flex-col items-center justify-center gap-2 mt-4">
-                <div class="text-xs text-zinc-500 font-semibold uppercase tracking-wider">Awaiting Data Ingestion</div>
-                <div class="text-[11px] text-zinc-600 max-w-xs mx-auto">
-                    Please upload your spreadsheet and select a data column above to begin computations.
-                </div>
-            </div>
         {% endif %}
         
     </div>
