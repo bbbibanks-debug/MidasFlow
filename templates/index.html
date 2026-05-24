@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIDASFLOW // BLOOMBERG_TERMINAL_EMULATION</title>
+    <script src="https://tailwindcss.com"></script>
+    <script src="https://plot.ly"></script>
+    <style>
+        @import url('https://googleapis.com');
+        body { font-family: 'Share Tech Mono', monospace; background-color: #0b0c10; color: #00ff66; }
+        .bb-border { border: 1px solid #1f2833; }
+        .bb-input { background-color: #1f2833; border: 1px solid #45f3ff; color: #45f3ff; }
+    </style>
+</head>
+<body class="p-6">
+    <!-- Header Bloomberg -->
+    <header class="bb-border p-3 mb-6 flex justify-between items-center bg-black">
+        <h1 class="text-2xl font-bold tracking-widest text-[#ffb000]">MIDASFLOW v1.0 // DATA_ANALYSIS_TERMINAL</h1>
+        <span class="text-sm text-[#45f3ff]">SYS_STATUS: ONLINE</span>
+    </header>
+
+    <!-- Upload Section -->
+    <section class="bb-border p-6 mb-6 bg-black">
+        <h2 class="text-lg mb-4 text-[#45f3ff]">> LOAD_EXCEL_DATA_SHEET:</h2>
+        <form action="/" method="POST" enctype="multipart/form-data" class="flex flex-col sm:flex-row gap-4">
+            <input type="file" name="file" accept=".xlsx, .xls" required class="bb-input p-2 flex-1 rounded cursor-pointer">
+            <button type="submit" class="bg-[#00ff66] text-black font-bold px-6 py-2 rounded hover:bg-[#00cc55] transition-all">
+                EXECUTE_ANALYSIS
+            </button>
+        </form>
+    </section>
+
+    {% if tables %}
+    <!-- Results Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Descriptive Stats Table -->
+        <div class="lg:col-span-1 bb-border p-4 bg-black overflow-x-auto">
+            <h3 class="text-md font-bold mb-3 text-[#ffb000]">> DESCRIPTIVE_STATISTICS</h3>
+            <div class="text-xs text-[#00ff66] uppercase">
+                {{ tables|safe }}
+            </div>
+        </div>
+
+        <!-- Graphs Section -->
+        <div class="lg:col-span-2 flex flex-col gap-6">
+            {% for graph in graphs %}
+            <div class="bb-border p-4 bg-black">
+                <h3 class="text-md font-bold mb-3 text-[#45f3ff]">> GRAPH_OUTPUT_{{ loop.index }}</h3>
+                <div id="graph-{{ loop.index }}" class="w-full"></div>
+                <script>
+                    var graphData = {{ graph|safe }};
+                    Plotly.newPlot('graph-{{ loop.index }}', graphData.data, graphData.layout, {responsive: true});
+                </script>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+    {% endif %}
+</body>
+</html>
