@@ -18,7 +18,6 @@
         .text-lime-neon { color: #ccff00; }
         .bg-lime-neon { background-color: #ccff00; }
         
-        /* Remove a seta padrão do details para um visual customizado e limpo */
         summary::-webkit-details-marker { display: none; }
         summary { list-style: none; }
     </style>
@@ -34,7 +33,6 @@
 
         <!-- Seção de Controles Superiores -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            
             <!-- Widget de Upload Moderno e Limpo -->
             <div class="card-panel p-4 flex flex-col justify-center">
                 <form action="/" method="POST" enctype="multipart/form-data" class="w-full">
@@ -62,7 +60,7 @@
         </div>
 
         <!-- Exibição dos Painéis Modulares -->
-        {% if tables_data_c or tables_data_r %}
+        {% if tables_data_c or tables_data_r or tables_data_d %}
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-1">
             
             <!-- Coluna de Cards Retráteis (Acordeão) -->
@@ -104,19 +102,37 @@
                     </div>
                 </details>
 
+                <!-- Card Expansível 03: Medidas de Dispersão Absoluta -->
+                <details class="card-panel group overflow-hidden transition-all duration-300" open>
+                    <summary class="flex justify-between items-center p-5 cursor-pointer select-none hover:bg-[#1c1f2b]">
+                        <h3 class="text-[10px] uppercase font-bold text-[#2962ff] tracking-wider">// 03. Medidas de Dispersão Absoluta</h3>
+                        <span class="text-xs text-zinc-500 font-mono transition-transform duration-200 group-open:rotate-180">▼</span>
+                    </summary>
+                    <div class="px-5 pb-5 pt-2 border-t border-[#232736]">
+                        <div class="grid grid-cols-2 gap-3">
+                            {% for item in tables_data_d %}
+                            <div class="stat-box p-3 flex flex-col justify-between">
+                                <span class="text-[10px] text-zinc-500 font-medium truncate mb-1">{{ item.name }}</span>
+                                <span class="text-xs text-[#2962ff] font-bold font-mono tracking-tight">{{ item.value }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </details>
+
             </div>
 
             <!-- Painel do Gráfico Lateral -->
-            <div class="lg:col-span-6 card-panel p-3 flex flex-col h-full min-h-[500px]">
-                <div class="p-2 bg-[#0c0d12] rounded-xl flex-1 flex flex-col justify-center h-full">
+            <div class="lg:col-span-6 card-panel p-3 flex flex-col h-full sticky top-4">
+                <div class="p-2 bg-[#0c0d12] rounded-xl flex-1 flex flex-col justify-center h-full min-h-[460px]">
                     {% for graph in graphs %}
-                    <div id="graph-{{ loop.index }}" class="w-full h-[460px]"></div>
+                    <div id="graph-{{ loop.index }}" class="w-full h-[520px]"></div>
                     <script>
                         var graphData = {{ graph|safe }};
                         graphData.layout.font.family = "Plus Jakarta Sans";
                         graphData.layout.font.color = "#a5a6b5";
-                        if(graphData.data && graphData.data[0]) {
-                            graphData.data[0].line = {
+                        if(graphData.data && graphData.data) {
+                            graphData.data.line = {
                                 color: "#ccff00",
                                 width: 2.5
                             };
