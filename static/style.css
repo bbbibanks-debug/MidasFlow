@@ -1,0 +1,116 @@
+@import url('https://googleapis.com');
+
+/* Variáveis de Cores Globais */
+:root {
+    --bg-main: #08090c;
+    --bg-container: #0f1015;
+    --bg-card: #14161f;
+    --bg-box: #1b1d26;
+    --border-color: #222633;
+    --text-muted: #6c7284;
+    --text-main: #a3aabf;
+    --neon-lime: #ccff00;
+    --neon-emerald: #00e699;
+    --neon-blue: #2979ff;
+}
+
+/* Reset e Tipografia */
+body { 
+    font-family: 'Plus Jakarta Sans', sans-serif; 
+    background-color: var(--bg-main); 
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Dashboard Container Principal */
+.dashboard-container { 
+    background-color: var(--bg-container); 
+    border-radius: 20px; 
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+/* Painéis de Cards */
+.card-panel { 
+    background-color: var(--bg-card); 
+    border-radius: 14px; 
+    border: 1px solid var(--border-color);
+}
+
+/* Blocos de Métricas (Boxes) e Microinterações */
+.stat-box { 
+    background-color: var(--bg-box); 
+    border: 1px solid transparent; 
+    border-radius: 10px; 
+    transition: all 0.2s ease;
+}
+
+.stat-box:hover { 
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+}
+
+.box-classic:hover { border-color: var(--neon-emerald); }
+.box-robust:hover { border-color: var(--neon-lime); }
+.box-dispersion:hover { border-color: var(--neon-blue); }
+
+/* Inputs e Dropdowns */
+.input-clean { 
+    background-color: var(--bg-box); 
+    border: 1px solid var(--border-color); 
+    color: #ffffff; 
+    transition: all 0.2s ease;
+}
+
+.input-clean:focus { 
+    border-color: var(--neon-lime); 
+    box-shadow: 0 0 0 2px rgba(204, 255, 0, 0.15);
+    outline: none; 
+}
+
+/* Customização dos Menus Retráteis (Accordion) */
+summary::-webkit-details-marker { display: none; }
+summary { list-style: none; }
+
+.accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    cursor: pointer;
+    user-select: none;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: background-color 0.2s ease;
+}
+
+.accordion-header:hover {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.accordion-content {
+    padding: 8px 20px 20px 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Área de Upload (Drag & Drop) */
+.drop-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 96px;
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    cursor: pointer;
+    background-color: rgba(0,0,0,0.15);
+    transition: all 0.2s ease;
+}
+
+.drop-zone:hover {
+    background-color: rgba(254, 254, 254, 0.01);
+    border-color: var(--neon-lime);
+}
