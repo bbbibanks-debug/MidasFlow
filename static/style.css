@@ -1,22 +1,22 @@
 @import url('https://googleapis.com');
 
-/* Variáveis de Cores Globais */
+/* Paleta de Cores Extraída da Imagem (Maria Bolo) */
 :root {
-    --bg-main: #08090c;
-    --bg-container: #0f1015;
-    --bg-card: #14161f;
-    --bg-box: #1b1d26;
-    --border-color: #222633;
-    --text-muted: #6c7284;
-    --text-main: #a3aabf;
-    --neon-lime: #ccff00;
-    --neon-emerald: #00e699;
-    --neon-blue: #2979ff;
+    --bg-main: #222222;          /* Fundo grafite escuro da tela */
+    --bg-container: #2b2b2b;     /* Fundo do painel do dashboard */
+    --bg-card: #333333;          /* Fundo dos cartões estruturais */
+    --bg-box: #444444;           /* Fundo dos mini-boxes numéricos */
+    --border-color: #555555;     /* Cor das bordas e divisores */
+    --text-muted: #aaaaaa;       /* Texto secundário cinza claro */
+    --text-main: #ffffff;        /* Texto principal branco */
+    --accent-orange: #d16b19;    /* Laranja queimado dos cards do topo */
+    --accent-gold: #ffaa44;      /* Tom dourado/bronze de destaque */
+    --accent-brown: #5c3a21;     /* Marrom chocolate para os hovers */
 }
 
-/* Reset e Tipografia */
+/* Reset e Tipografia Padrão Windows/Segoe UI */
 body { 
-    font-family: 'Plus Jakarta Sans', sans-serif; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
     background-color: var(--bg-main); 
     color: var(--text-main);
     -webkit-font-smoothing: antialiased;
@@ -25,34 +25,36 @@ body {
 /* Dashboard Container Principal */
 .dashboard-container { 
     background-color: var(--bg-container); 
-    border-radius: 20px; 
+    border-radius: 8px; 
     border: 1px solid var(--border-color);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 /* Painéis de Cards */
 .card-panel { 
     background-color: var(--bg-card); 
-    border-radius: 14px; 
+    border-radius: 6px; 
     border: 1px solid var(--border-color);
 }
 
-/* Blocos de Métricas (Boxes) e Microinterações */
+/* Blocos de Métricas (Boxes) Baseados no Topo da Imagem */
 .stat-box { 
-    background-color: var(--bg-box); 
-    border: 1px solid transparent; 
-    border-radius: 10px; 
+    background-color: rgba(209, 107, 25, 0.08); /* Tom de laranja com opacidade */
+    border: 1px solid #d16b19; 
+    border-radius: 6px; 
     transition: all 0.2s ease;
 }
 
 .stat-box:hover { 
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    background-color: var(--accent-brown);
+    border-color: var(--accent-gold);
+    transform: translateY(-1px);
 }
 
-.box-classic:hover { border-color: var(--neon-emerald); }
-.box-robust:hover { border-color: var(--neon-lime); }
-.box-dispersion:hover { border-color: var(--neon-blue); }
+/* Customização por Categoria baseada nos Blocos da Imagem */
+.box-classic { border-left: 4px solid var(--accent-orange); }
+.box-robust { border-left: 4px solid var(--accent-gold); }
+.box-dispersion { border-left: 4px solid #8e5a32; }
 
 /* Inputs e Dropdowns */
 .input-clean { 
@@ -63,8 +65,8 @@ body {
 }
 
 .input-clean:focus { 
-    border-color: var(--neon-lime); 
-    box-shadow: 0 0 0 2px rgba(204, 255, 0, 0.15);
+    border-color: var(--accent-orange); 
+    box-shadow: 0 0 0 2px rgba(209, 107, 25, 0.2);
     outline: none; 
 }
 
@@ -76,41 +78,41 @@ summary { list-style: none; }
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 20px;
+    padding: 14px 18px;
     cursor: pointer;
     user-select: none;
-    font-size: 10px;
-    font-weight: 700;
+    font-size: 11px;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.03em;
     transition: background-color 0.2s ease;
 }
 
 .accordion-header:hover {
-    background-color: rgba(255, 255, 255, 0.02);
+    background-color: rgba(255, 255, 255, 0.03);
 }
 
 .accordion-content {
-    padding: 8px 20px 20px 20px;
+    padding: 8px 18px 18px 18px;
     border-top: 1px solid var(--border-color);
 }
 
-/* Área de Upload (Drag & Drop) */
+/* Área de Ingestão de Planilha (Upload) */
 .drop-zone {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
-    height: 96px;
+    height: 84px;
     border: 2px dashed var(--border-color);
-    border-radius: 12px;
+    border-radius: 8px;
     cursor: pointer;
-    background-color: rgba(0,0,0,0.15);
+    background-color: rgba(0, 0, 0, 0.2);
     transition: all 0.2s ease;
 }
 
 .drop-zone:hover {
-    background-color: rgba(254, 254, 254, 0.01);
-    border-color: var(--neon-lime);
+    background-color: rgba(209, 107, 25, 0.05);
+    border-color: var(--accent-orange);
 }
