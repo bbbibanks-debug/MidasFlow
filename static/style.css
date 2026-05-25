@@ -1,77 +1,82 @@
 @import url('https://googleapis.com');
 
-/* Nova Paleta Corporativa Extraída da Imagem (Estilo Power BI Clean) */
+/* Paleta de Cores de Luxo: Preto Absoluto e Ouro Metálico */
 :root {
-    --bg-page-top: #151a30;      /* Azul marinho escuro do cabeçalho */
-    --bg-page-body: #eef2f7;     /* Cinza claro azulado suave do fundo */
-    --bg-container: #ffffff;    /* Blocos/Cards totalmente brancos */
-    --bg-box: #f8f9fa;           /* Fundo cinza bem claro dos mini-boxes */
-    --border-color: #e3e6f0;     /* Linhas e divisores sutis */
-    --text-main: #333333;        /* Texto principal escuro */
-    --text-muted: #858796;       /* Rótulos secundários cinza */
-    
-    /* Gradientes e Cores Vibrantes dos Cards da Imagem */
-    --pbi-purple: #5c25d9;       /* Roxo elétrico */
-    --pbi-pink: #ff4a83;         /* Rosa magenta */
-    --pbi-mint: #00d293;         /* Verde menta/neon */
-    --pbi-blue: #007bff;         /* Azul corporativo */
+    --bg-main: #0a0b0d;          /* Fundo preto absoluto fosco */
+    --bg-container: #111317;     /* Fundo do painel em grafite escuro */
+    --bg-card: #16191f;          /* Fundo dos cartões estruturais */
+    --bg-box: #1c2026;           /* Fundo dos mini-boxes numéricos */
+    --border-color: #2c2212;     /* Bordas sutis em tom bronze escuro */
+    --text-muted: #8c8e94;       /* Rótulos secundários cinza acetinado */
+    --text-main: #e1e2e6;        /* Texto principal off-white */
+    --accent-gold: #c5a880;      /* Dourado metálico institucional fosco */
+    --accent-gold-bright: #e5c99e; /* Dourado brilhante para realces */
 }
 
-/* Reset Global e Tipografia Moderna */
+/* Reset Global e Tipografia Elegante */
 body { 
-    font-family: 'Plus Jakarta Sans', sans-serif; 
-    background: linear-gradient(to bottom, var(--bg-page-top) 180px, var(--bg-page-body) 180px);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    background: var(--bg-main);
     color: var(--text-main);
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
 }
 
-/* Container Principal do Dashboard */
-.dashboard-container { 
-    background-color: transparent;
+/* Títulos Romanos de Alta Costura */
+h1, h2, h3, h4 {
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.06em;
 }
 
-/* Painéis de Cards Flutuantes Brancos (Estilo Imagem) */
-.card-panel { 
-    background-color: var(--bg-container); 
-    border-radius: 12px; 
+/* Container Principal do Dashboard */
+.dashboard-container { 
+    background-color: var(--bg-container);
+    border-radius: 4px; 
     border: 1px solid var(--border-color);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+}
+
+/* Painéis de Cards Estilo Portfólio Premium */
+.card-panel { 
+    background-color: var(--bg-card); 
+    border-radius: 4px; 
+    border: 1px solid var(--border-color);
 }
 
 /* Mini Boxes de Métricas Alinhados Verticalmente */
 .stat-box { 
     background-color: var(--bg-box);
-    border: 1px solid var(--border-color); 
-    border-radius: 8px; 
-    transition: all 0.2s ease;
+    border: 1px solid #231d13; 
+    border-radius: 2px; 
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .stat-box:hover { 
-    background-color: #ffffff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    background-color: #222730;
+    border-color: var(--accent-gold);
+    box-shadow: 0 4px 15px rgba(197, 168, 128, 0.1);
     transform: translateY(-1px);
 }
 
-/* Indicadores de Borda Superior baseados nos Cards da Imagem */
-.box-classic { border-top: 3px solid var(--pbi-purple); }
-.box-robust { border-top: 3px solid var(--pbi-pink); }
-.box-dispersion { border-top: 3px solid var(--pbi-mint); }
-.box-relative { border-top: 3px solid var(--pbi-blue); }
+/* Friso Superior Dourado Fino em Todos os Cards Padronizados */
+.box-classic { border-top: 1px solid var(--accent-gold); }
 
-/* Inputs, Dropdowns e Área de Upload */
+/* Inputs e Dropdowns Realçados em Ouro */
 .input-clean { 
-    background-color: #ffffff; 
+    background-color: var(--bg-box); 
     border: 1px solid var(--border-color); 
-    color: var(--text-main); 
+    color: #ffffff; 
+    font-family: 'Cormorant Garamond', serif;
     transition: all 0.2s ease;
 }
 
 .input-clean:focus { 
-    border-color: var(--pbi-purple); 
+    border-color: var(--accent-gold-bright); 
+    box-shadow: 0 0 8px rgba(197, 168, 128, 0.2);
     outline: none; 
 }
 
+/* Área de Upload (Drag & Drop) */
 .drop-zone {
     display: flex;
     flex-direction: column;
@@ -79,42 +84,14 @@ body {
     justify-content: center;
     width: 100%;
     height: 84px;
-    border: 2px dashed var(--border-color);
-    border-radius: 10px;
+    border: 1px dashed var(--border-color);
+    border-radius: 4px;
     cursor: pointer;
-    background-color: rgba(255, 255, 255, 0.6);
+    background-color: rgba(0, 0, 0, 0.2);
     transition: all 0.2s ease;
 }
 
 .drop-zone:hover {
-    background-color: #ffffff;
-    border-color: var(--pbi-purple);
-}
-
-/* Customização dos Sanfonados (Accordion) */
-summary::-webkit-details-marker { display: none; }
-summary { list-style: none; }
-
-.accordion-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 20px;
-    cursor: pointer;
-    user-select: none;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-    color: #4e73df; /* Tom azul clássico do Power BI para títulos */
-    transition: background-color 0.2s ease;
-}
-
-.accordion-header:hover {
-    background-color: #f8f9fc;
-}
-
-.accordion-content {
-    padding: 14px 20px 20px 20px;
-    border-top: 1px solid var(--border-color);
+    background-color: rgba(197, 168, 128, 0.03);
+    border-color: var(--accent-gold);
 }
