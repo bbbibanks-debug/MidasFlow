@@ -17,6 +17,10 @@
         .input-clean:focus { border-color: #ccff00; outline: none; }
         .text-lime-neon { color: #ccff00; }
         .bg-lime-neon { background-color: #ccff00; }
+        
+        /* Remove a seta padrão do details para um visual customizado e limpo */
+        summary::-webkit-details-marker { display: none; }
+        summary { list-style: none; }
     </style>
 </head>
 <body class="p-4 md:p-8 min-h-screen flex items-center justify-center">
@@ -38,7 +42,6 @@
                         <div class="flex flex-col items-center justify-center">
                             <p class="text-[11px] text-zinc-400 font-medium"><span class="text-lime-neon font-bold">Clique para carregar</span> ou arraste a planilha</p>
                         </div>
-                        <!-- input nativo hidden esconde o botão padrão 'Escolher arquivo' -->
                         <input type="file" name="file" accept=".xlsx, .xls" required class="hidden" onchange="this.form.submit()">
                     </label>
                 </form>
@@ -58,42 +61,52 @@
             </div>
         </div>
 
-        <!-- Exibição dos Painéis Modulares em Boxes Harmonizados -->
+        <!-- Exibição dos Painéis Modulares -->
         {% if tables_data_c or tables_data_r %}
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-1">
             
-            <!-- Boxes de Estatísticas -->
-            <div class="lg:col-span-6 flex flex-col gap-6">
+            <!-- Coluna de Cards Retráteis (Acordeão) -->
+            <div class="lg:col-span-6 flex flex-col gap-4">
                 
-                <!-- Bloco 01: Clássicas -->
-                <div class="card-panel p-5">
-                    <h3 class="text-[10px] uppercase font-bold text-zinc-500 tracking-wider mb-4">// 01. Medidas Clássicas</h3>
-                    <div class="grid grid-cols-2 gap-3">
-                        {% for item in tables_data_c %}
-                        <div class="stat-box p-3 flex flex-col justify-between">
-                            <span class="text-[10px] text-zinc-500 font-medium truncate mb-1">{{ item.name }}</span>
-                            <span class="text-xs text-[#00c087] font-bold font-mono tracking-tight">{{ item.value }}</span>
+                <!-- Card Expansível 01: Medidas Clássicas -->
+                <details class="card-panel group overflow-hidden transition-all duration-300">
+                    <summary class="flex justify-between items-center p-5 cursor-pointer select-none hover:bg-[#1c1f2b]">
+                        <h3 class="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">// 01. Medidas Clássicas</h3>
+                        <span class="text-xs text-zinc-500 font-mono transition-transform duration-200 group-open:rotate-180">▼</span>
+                    </summary>
+                    <div class="px-5 pb-5 pt-2 border-t border-[#232736]">
+                        <div class="grid grid-cols-2 gap-3">
+                            {% for item in tables_data_c %}
+                            <div class="stat-box p-3 flex flex-col justify-between">
+                                <span class="text-[10px] text-zinc-500 font-medium truncate mb-1">{{ item.name }}</span>
+                                <span class="text-xs text-[#00c087] font-bold font-mono tracking-tight">{{ item.value }}</span>
+                            </div>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
                     </div>
-                </div>
+                </details>
 
-                <!-- Bloco 02: Robustas -->
-                <div class="card-panel p-5">
-                    <h3 class="text-[10px] uppercase font-bold text-[#ff9800] tracking-wider mb-4">// 02. Medidas Robustas e Modificadas</h3>
-                    <div class="grid grid-cols-2 gap-3">
-                        {% for item in tables_data_r %}
-                        <div class="stat-box p-3 flex flex-col justify-between">
-                            <span class="text-[10px] text-zinc-500 font-medium truncate mb-1">{{ item.name }}</span>
-                            <span class="text-xs text-lime-neon font-bold font-mono tracking-tight">{{ item.value }}</span>
+                <!-- Card Expansível 02: Medidas Robustas -->
+                <details class="card-panel group overflow-hidden transition-all duration-300">
+                    <summary class="flex justify-between items-center p-5 cursor-pointer select-none hover:bg-[#1c1f2b]">
+                        <h3 class="text-[10px] uppercase font-bold text-[#ff9800] tracking-wider">// 02. Medidas Robustas e Modificadas</h3>
+                        <span class="text-xs text-zinc-500 font-mono transition-transform duration-200 group-open:rotate-180">▼</span>
+                    </summary>
+                    <div class="px-5 pb-5 pt-2 border-t border-[#232736]">
+                        <div class="grid grid-cols-2 gap-3">
+                            {% for item in tables_data_r %}
+                            <div class="stat-box p-3 flex flex-col justify-between">
+                                <span class="text-[10px] text-zinc-500 font-medium truncate mb-1">{{ item.name }}</span>
+                                <span class="text-xs text-lime-neon font-bold font-mono tracking-tight">{{ item.value }}</span>
+                            </div>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
                     </div>
-                </div>
+                </details>
 
             </div>
 
-            <!-- Painel do Gráfico -->
+            <!-- Painel do Gráfico Lateral -->
             <div class="lg:col-span-6 card-panel p-3 flex flex-col h-full min-h-[500px]">
                 <div class="p-2 bg-[#0c0d12] rounded-xl flex-1 flex flex-col justify-center h-full">
                     {% for graph in graphs %}
