@@ -49,7 +49,7 @@
             </div>
         </div>
 
-        <!-- Layout em Duas Colunas Lado a Lado (Métricas na Esquerda, Gráfico na Direita) -->
+        <!-- Layout em Duas Colunas Lado a Lado -->
         {% if tables_data_c or tables_data_r or tables_data_d %}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start flex-1 w-full">
             
@@ -73,7 +73,6 @@
                         </div>
                     </div>
                 </details>
-
                 <!-- Medidas Robustas -->
                 <details class="card-panel group overflow-hidden">
                     <summary class="accordion-header">
@@ -112,26 +111,27 @@
 
             </div>
 
-            <!-- Coluna 2 (Direita): Contêiner Dedicado ao Gráfico Dinâmico -->
-            <div class="card-panel p-4 flex flex-col h-full sticky top-4 w-full">
-                <div class="p-2 rounded-lg flex-1 flex flex-col justify-center h-full min-h-[500px]" style="background-color: var(--bg-main);">
+            <!-- Coluna 2 (Direita): Contêiner com renderização assíncrona blindada -->
+            <div class="card-panel p-4 flex flex-col sticky top-4 w-full bg-[#333333]">
+                <div class="p-2 rounded-lg flex flex-col justify-center min-h-[500px]" style="background-color: var(--bg-main);">
                     {% for graph in graphs %}
-                    <div id="graph-panel-target" class="w-full h-[540px]"></div>
+                    <div id="graph-panel-target" class="w-full h-[480px]"></div>
                     <script>
-                        var graphData = {{ graph|safe }};
-                        graphData.layout.font.family = "Segoe UI";
-                        graphData.layout.font.color = "#aaaaaa";
-                        
-                        // Garante o preenchimento fluido do contêiner sem quebras de tamanho fixo
-                        graphData.layout.autosize = true;
-                        
-                        if(graphData.data && graphData.data[0]) {
-                            graphData.data[0].line = {
-                                color: "#d16b19",
-                                width: 2.5
-                            };
-                        }
-                        Plotly.newPlot('graph-panel-target', graphData.data, graphData.layout, {responsive: true, displayModeBar: false});
+                        // Blindagem assíncrona para garantir que o contêiner exista antes de plotar
+                        requestAnimationFrame(function() {
+                            var graphData = {{ graph|safe }};
+                            graphData.layout.font.family = "Segoe UI";
+                            graphData.layout.font.color = "#aaaaaa";
+                            graphData.layout.autosize = true;
+                            
+                            if(graphData.data && graphData.data[0]) {
+                                graphData.data[0].line = {
+                                    color: "#d16b19",
+                                    width: 2.5
+                                };
+                            }
+                            Plotly.newPlot('graph-panel-target', graphData.data, graphData.layout, {responsive: true, displayModeBar: false});
+                        });
                     </script>
                     {% endfor %}
                 </div>
