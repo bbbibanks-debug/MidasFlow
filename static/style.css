@@ -9,7 +9,7 @@
     --border-color: #555555;     /* Cor das bordas e divisores */
     --text-muted: #aaaaaa;       /* Texto secundário cinza claro */
     --text-main: #ffffff;        /* Texto principal branco */
-    --accent-orange: #d16b19;    /* Laranja queimado dos cards do topo */
+    --accent-orange: #d16b19;    /* Laranja queimado institucional */
     --accent-gold: #ffaa44;      /* Tom dourado/bronze de destaque */
     --accent-brown: #5c3a21;     /* Marrom chocolate para os hovers */
 }
@@ -37,10 +37,10 @@ body {
     border: 1px solid var(--border-color);
 }
 
-/* Blocos de Métricas (Boxes) Baseados no Topo da Imagem */
+/* Boxes Alinhados Verticalmente (Nome em cima, valor embaixo) */
 .stat-box { 
-    background-color: rgba(209, 107, 25, 0.08); /* Tom de laranja com opacidade */
-    border: 1px solid #d16b19; 
+    background-color: rgba(209, 107, 25, 0.06);
+    border: 1px solid var(--border-color); 
     border-radius: 6px; 
     transition: all 0.2s ease;
 }
@@ -51,10 +51,9 @@ body {
     transform: translateY(-1px);
 }
 
-/* Customização por Categoria baseada nos Blocos da Imagem */
-.box-classic { border-left: 4px solid var(--accent-orange); }
-.box-robust { border-left: 4px solid var(--accent-gold); }
-.box-dispersion { border-left: 4px solid #8e5a32; }
+.box-classic { border-top: 3px solid var(--accent-orange); }
+.box-robust { border-top: 3px solid var(--accent-gold); }
+.box-dispersion { border-top: 3px solid #8e5a32; }
 
 /* Inputs e Dropdowns */
 .input-clean { 
@@ -66,7 +65,6 @@ body {
 
 .input-clean:focus { 
     border-color: var(--accent-orange); 
-    box-shadow: 0 0 0 2px rgba(209, 107, 25, 0.2);
     outline: none; 
 }
 
@@ -84,7 +82,6 @@ summary { list-style: none; }
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.03em;
     transition: background-color 0.2s ease;
 }
 
@@ -93,7 +90,7 @@ summary { list-style: none; }
 }
 
 .accordion-content {
-    padding: 8px 18px 18px 18px;
+    padding: 12px 18px 18px 18px;
     border-top: 1px solid var(--border-color);
 }
 
