@@ -14,7 +14,6 @@
     --accent-brown: #5c3a21;     /* Marrom chocolate para os hovers */
 }
 
-/* Reset e Tipografia Padrão Windows/Segoe UI */
 body { 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
     background-color: var(--bg-main); 
@@ -22,7 +21,6 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* Dashboard Container Principal */
 .dashboard-container { 
     background-color: var(--bg-container); 
     border-radius: 8px; 
@@ -30,14 +28,12 @@ body {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-/* Painéis de Cards */
 .card-panel { 
     background-color: var(--bg-card); 
     border-radius: 6px; 
     border: 1px solid var(--border-color);
 }
 
-/* Boxes Alinhados Verticalmente (Nome em cima, valor embaixo) */
 .stat-box { 
     background-color: rgba(209, 107, 25, 0.06);
     border: 1px solid var(--border-color); 
@@ -55,7 +51,6 @@ body {
 .box-robust { border-top: 3px solid var(--accent-gold); }
 .box-dispersion { border-top: 3px solid #8e5a32; }
 
-/* Inputs e Dropdowns */
 .input-clean { 
     background-color: var(--bg-box); 
     border: 1px solid var(--border-color); 
@@ -68,7 +63,6 @@ body {
     outline: none; 
 }
 
-/* Customização dos Menus Retráteis (Accordion) */
 summary::-webkit-details-marker { display: none; }
 summary { list-style: none; }
 
@@ -94,7 +88,6 @@ summary { list-style: none; }
     border-top: 1px solid var(--border-color);
 }
 
-/* Área de Ingestão de Planilha (Upload) */
 .drop-zone {
     display: flex;
     flex-direction: column;
