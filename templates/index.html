@@ -6,16 +6,15 @@
     <title>MIDASFLOW</title>
     <script src="https://tailwindcss.com"></script>
     <script src="https://plot.ly"></script>
-    <!-- Chamada do arquivo CSS Externo e Isolado com padrão Flask -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="p-4 md:p-8 min-h-screen flex items-center justify-center">
 
     <div class="w-full max-w-6xl dashboard-container p-6 md:p-8 flex flex-col overflow-hidden">
         
-        <!-- Topbar -->
-        <div class="mb-6 flex justify-between items-center border-b border-[#222633] pb-4">
-            <h1 class="text-white text-lg font-bold tracking-tight">MidasFlow <span class="text-xs font-mono font-normal text-zinc-500 ml-2">// QUANT_ENGINE_v1.3</span></h1>
+        <!-- Topbar com Título Comercial Limpo -->
+        <div class="mb-6 flex justify-between items-center border-b border-[#555555] pb-4">
+            <h1 class="text-white text-lg font-bold tracking-tight">MidasFlow <span class="text-xs font-mono font-normal text-zinc-400 ml-2">// BUSINESS_INTELLIGENCE_ENGINE</span></h1>
         </div>
 
         <!-- Seção de Controles Superiores -->
@@ -25,7 +24,7 @@
             <div class="card-panel p-4 flex flex-col justify-center">
                 <form action="/" method="POST" enctype="multipart/form-data" class="w-full">
                     <label class="drop-zone">
-                        <p class="text-[11px] text-zinc-400 font-medium"><span style="color: var(--neon-lime);" class="font-bold">Carregar Planilha</span> ou arrastar arquivo</p>
+                        <p class="text-[11px] text-zinc-300 font-medium"><span style="color: var(--accent-gold);" class="font-bold">Carregar Planilha</span> ou arrastar arquivo de vendas</p>
                         <input type="file" name="file" accept=".xlsx, .xls" required class="hidden" onchange="this.form.submit()">
                     </label>
                 </form>
@@ -34,8 +33,8 @@
             <!-- Seletor de Variáveis -->
             <div class="card-panel p-4 flex flex-col justify-center">
                 <form action="/" method="POST" class="w-full">
-                    <label class="block text-[10px] uppercase font-bold tracking-wider mb-2" style="color: var(--text-muted);">Variável Ativa para Escaneamento</label>
-                    <select name="target_variable" required onchange="this.form.submit()" class="input-clean w-full p-3 rounded-xl text-xs font-semibold cursor-pointer">
+                    <label class="block text-[10px] uppercase font-bold tracking-wider mb-2" style="color: var(--text-muted);">Métrica/Coluna Ativa para Filtro</label>
+                    <select name="target_variable" required onchange="this.form.submit()" class="input-clean w-full p-3 rounded-lg text-xs font-semibold cursor-pointer">
                         <option value="">-- SELECIONE A COLUNA DE DADOS --</option>
                         {% for col in columns %}
                         <option value="{{ col }}" {% if col == selected_var %}selected{% endif %}>{{ col }}</option>
@@ -63,7 +62,7 @@
                             {% for item in tables_data_c %}
                             <div class="stat-box box-classic p-3 flex flex-col justify-between">
                                 <span class="text-[10px] font-medium truncate mb-1" style="color: var(--text-muted);">{{ item.name }}</span>
-                                <span class="text-xs font-bold font-mono tracking-tight" style="color: var(--neon-emerald);">{{ item.value }}</span>
+                                <span class="text-xs font-bold font-mono tracking-tight" style="color: var(--text-main);">{{ item.value }}</span>
                             </div>
                             {% endfor %}
                         </div>
@@ -81,7 +80,7 @@
                             {% for item in tables_data_r %}
                             <div class="stat-box box-robust p-3 flex flex-col justify-between">
                                 <span class="text-[10px] font-medium truncate mb-1" style="color: var(--text-muted);">{{ item.name }}</span>
-                                <span class="text-xs font-bold font-mono tracking-tight" style="color: var(--neon-lime);">{{ item.value }}</span>
+                                <span class="text-xs font-bold font-mono tracking-tight" style="color: var(--accent-gold);">{{ item.value }}</span>
                             </div>
                             {% endfor %}
                         </div>
@@ -99,7 +98,7 @@
                             {% for item in tables_data_d %}
                             <div class="stat-box box-dispersion p-3 flex flex-col justify-between">
                                 <span class="text-[10px] font-medium truncate mb-1" style="color: var(--text-muted);">{{ item.name }}</span>
-                                <span class="text-xs font-bold font-mono tracking-tight" style="color: var(--neon-blue);">{{ item.value }}</span>
+                                <span class="text-xs font-bold font-mono tracking-tight" style="color: var(--accent-orange);">{{ item.value }}</span>
                             </div>
                             {% endfor %}
                         </div>
@@ -115,11 +114,12 @@
                     <div id="graph-{{ loop.index }}" class="w-full h-[520px]"></div>
                     <script>
                         var graphData = {{ graph|safe }};
-                        graphData.layout.font.family = "Plus Jakarta Sans";
-                        graphData.layout.font.color = "#a3aabf";
+                        graphData.layout.font.family = "Segoe UI";
+                        graphData.layout.font.color = "#aaaaaa";
                         if(graphData.data && graphData.data) {
+                            // Altera a linha do gráfico para o tom laranja queimado institucional da imagem
                             graphData.data.line = {
-                                color: "#ccff00",
+                                color: "#d16b19",
                                 width: 2.5
                             };
                         }
