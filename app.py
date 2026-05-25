@@ -1,11 +1,12 @@
 import os
 import json
+import io
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.utils
 from scipy import stats
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, send_file
 
 app = Flask(__name__)
 
@@ -38,13 +39,11 @@ def processar_metricas_lista(df, col):
     valores = col_data.to_numpy()
     n = len(valores)
     
-    # -------------------------------------------------------------
     # BLOCO 01: MEDIDAS CLÁSSICAS
-    # -------------------------------------------------------------
     m_aritmetica = np.mean(valores)
     mediana = np.median(valores)
     moda_res = stats.mode(valores, keepdims=True)
-    moda = moda_res.mode if len(moda_res.mode) > 0 else "—"
+    moda = moda_res.mode[0] if len(moda_res.mode) > 0 else "—"
     ponto_medio = (np.max(valores) + np.min(valores)) / 2
     
     try:
@@ -60,9 +59,7 @@ def processar_metricas_lista(df, col):
     m_quadratica = np.sqrt(np.mean(valores**2))
     m_cubica = np.cbrt(np.mean(valores**3))
     
-    # -------------------------------------------------------------
     # BLOCO 02: MEDIDAS ROBUSTAS E MODIFICADAS
-    # -------------------------------------------------------------
     m_aparada = stats.trim_mean(valores, proportiontocut=0.10)
     valores_winsor = stats.mstats.winsorize(valores, limits=[0.05, 0.05]).compressed()
     m_winsorizada = np.mean(valores_winsor)
@@ -98,9 +95,7 @@ def processar_metricas_lista(df, col):
     except Exception:
         moda_geometrica = m_aritmetica
 
-    # -------------------------------------------------------------
     # BLOCO 03: MEDIDAS DE DISPERSÃO ABSOLUTA
-    # -------------------------------------------------------------
     v_populacional = np.var(valores)
     v_amostral = np.var(valores, ddof=1) if n > 1 else np.nan
     dp_populacional = np.sqrt(v_populacional)
@@ -117,18 +112,15 @@ def processar_metricas_lista(df, col):
     dp_winsorizado = np.std(valores_winsor)
     dp_aparado = np.std(valores_aparados)
     
-    # Gini da diferença média (Usa subamostragem por eficiência computacional O(N^2))
     abs_diffs = np.abs(valores_sub[:, None] - valores_sub)
     gini_diff_media = np.mean(abs_diffs)
     
-    # Média das amplitudes das amostras (Agrupamentos de 5 elementos)
     if n >= 5:
         subgrupos = [valores[i:i+5] for i in range(0, n - n%5, 5)]
         media_amp_amostras = np.mean([np.max(g) - np.min(g) for g in subgrupos]) if subgrupos else np.nan
     else:
         media_amp_amostras = np.nan
         
-    # Variância e Desvio Padrão Geométrico
     if np.all(valores > 0):
         try:
             log_valores = np.log(valores)
@@ -139,7 +131,6 @@ def processar_metricas_lista(df, col):
     else:
         var_geom, dp_geometrico = "REQUER VALORES > 0", "REQUER VALORES > 0"
 
-    # Geração dos dicionários de interface
     metricas_c = ["Média Aritmética", "Mediana", "Moda", "Ponto Médio", "Média Geométrica", "Média Harmônica", "Média Quadrática", "Média Cúbica"]
     valores_c = [m_aritmetica, mediana, moda, ponto_medio, m_geometrica, m_harmonica, m_quadratica, m_cubica]
     data_c = [{"name": m, "value": formatar_numero_terminal(v)} for m, v in zip(metricas_c, valores_c)]
@@ -212,10 +203,10 @@ def handle_post():
                     template="plotly_dark",
                     paper_bgcolor="rgba(0,0,0,0)",
                     plot_bgcolor="rgba(0,0,0,0)",
-                    font=dict(family="Plus Jakarta Sans", size=10, color="#a5a6b5"),
+                    font=dict(family="Segoe UI", size=10, color="#aaaaaa"),
                     margin=dict(l=40, r=20, t=20, b=40),
-                    xaxis=dict(gridcolor="#1c1c27", linecolor="#23232f", title=None),
-                    yaxis=dict(gridcolor="#1c1c27", linecolor="#23232f", title=None)
+                    xaxis=dict(gridcolor="#333333", linecolor="#555555", title=None),
+                    yaxis=dict(gridcolor="#333333", linecolor="#555555", title=None)
                 )
                 
                 DATA_STORE['graphs'] = [json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)]
@@ -223,6 +214,33 @@ def handle_post():
                 pass
 
     return redirect(url_for('home'))
+
+@app.route('/download-metrics', methods=['GET'])
+def download_metrics():
+    """Gera um arquivo Excel estruturado com todas as métricas calculadas em memória."""
+    if DATA_STORE['selected_var'] is None:
+        return redirect(url_for('home'))
+        
+    todas_metricas = []
+    if DATA_STORE['tables_data_c']:
+        todas_metricas.extend(DATA_STORE['tables_data_c'])
+    if DATA_STORE['tables_data_r']:
+        todas_metricas.extend(DATA_STORE['tables_data_r'])
+    if DATA_STORE['tables_data_d']:
+        todas_metricas.extend(DATA_STORE['tables_data_d'])
+        
+    # Converte para DataFrame do Pandas
+    export_df = pd.DataFrame(todas_metricas)
+    export_df.columns = ['Métrica Estatística', 'Valor Calculado']
+    
+    # Escreve o Excel em bytes virtuais
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        export_df.to_excel(writer, index=False, sheet_name='Summary_Metrics')
+    output.seek(0)
+    
+    nome_arquivo = f"MidasFlow_Metrics_{DATA_STORE['selected_var']}.xlsx"
+    return send_file(output, as_attachment=True, download_name=nome_arquivo, mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 if __name__ == '__main__':
     porta = int(os.environ.get("PORT", 5000))
