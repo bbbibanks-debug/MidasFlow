@@ -31,14 +31,14 @@
         <!-- Seção de Controles Superiores -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             
-            <!-- 1. Widget de Upload Moderno (Drag & Drop Visual) -->
+            <!-- Widget de Upload Moderno e Limpo -->
             <div class="card-panel p-4 flex flex-col justify-center">
                 <form action="/" method="POST" enctype="multipart/form-data" class="w-full">
                     <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-[#2d3142] rounded-xl cursor-pointer bg-[#14161f] hover:bg-[#1c1f2b] hover:border-[#ccff00] transition-all p-2">
-                        <div class="flex flex-col items-center justify-center pt-2 pb-2">
-                            <p class="text-[11px] text-zinc-400 font-medium mb-1"><span class="text-lime-neon font-bold">Clique para carregar</span> ou arraste a planilha</p>
-                            <p class="text-[9px] text-zinc-500 font-mono">Formatos suportados: .xlsx, .xls</p>
+                        <div class="flex flex-col items-center justify-center">
+                            <p class="text-[11px] text-zinc-400 font-medium"><span class="text-lime-neon font-bold">Clique para carregar</span> ou arraste a planilha</p>
                         </div>
+                        <!-- input nativo hidden esconde o botão padrão 'Escolher arquivo' -->
                         <input type="file" name="file" accept=".xlsx, .xls" required class="hidden" onchange="this.form.submit()">
                     </label>
                 </form>
@@ -62,7 +62,7 @@
         {% if tables_data_c or tables_data_r %}
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-1">
             
-            <!-- 3. Boxes de Estatísticas -->
+            <!-- Boxes de Estatísticas -->
             <div class="lg:col-span-6 flex flex-col gap-6">
                 
                 <!-- Bloco 01: Clássicas -->
