@@ -25,7 +25,7 @@
 
         <!-- Formulários Superiores -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <!-- Upload de Planilha -->
+            <!-- Widget de Upload de Planilha -->
             <div class="card-panel p-4 flex flex-col justify-center">
                 <form action="/" method="POST" enctype="multipart/form-data" class="w-full">
                     <label class="drop-zone">
@@ -50,7 +50,7 @@
         </div>
 
         <!-- Layout em Duas Colunas Lado a Lado -->
-        {% if tables_data_c or tables_data_r or tables_data_d %}
+        {% if tables_data_c or tables_data_r or tables_data_d or tables_data_p %}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start flex-1 w-full">
             
             <!-- Coluna 1 (Esquerda): Painéis Sanfonados de Métricas -->
@@ -73,6 +73,7 @@
                         </div>
                     </div>
                 </details>
+
                 <!-- Medidas Robustas -->
                 <details class="card-panel group overflow-hidden">
                     <summary class="accordion-header">
@@ -90,9 +91,8 @@
                         </div>
                     </div>
                 </details>
-
                 <!-- Dispersão Absoluta -->
-                <details class="card-panel group overflow-hidden" open>
+                <details class="card-panel group overflow-hidden">
                     <summary class="accordion-header">
                         <span style="color: var(--text-main);">Medidas de Dispersão Absoluta</span>
                         <span class="text-[10px] transition-transform duration-200 group-open:rotate-180" style="color: var(--text-muted);">▼</span>
@@ -109,9 +109,27 @@
                     </div>
                 </details>
 
+                <!-- Dispersão Relativa e Padronizada (Nova Aba) -->
+                <details class="card-panel group overflow-hidden" open>
+                    <summary class="accordion-header">
+                        <span style="color: var(--text-main);">Medidas de Dispersão Relativa e Padronizada</span>
+                        <span class="text-[10px] transition-transform duration-200 group-open:rotate-180" style="color: var(--text-muted);">▼</span>
+                    </summary>
+                    <div class="accordion-content">
+                        <div class="grid grid-cols-2 gap-3">
+                            {% for item in tables_data_p %}
+                            <div class="stat-box box-relative p-3.5 flex flex-col gap-2">
+                                <span class="text-[10px] text-zinc-400 font-medium truncate">{{ item.name }}</span>
+                                <span class="text-sm font-bold tracking-tight font-mono" style="color: var(--accent-purple);">{{ item.value }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </details>
+
             </div>
 
-            <!-- Coluna 2 (Direita): Contêiner Corrigido para Mapeamento em Array do Plotly -->
+            <!-- Coluna 2 (Direita): Contêiner com renderização assíncrona do Gráfico -->
             <div class="card-panel p-4 flex flex-col sticky top-4 w-full bg-[#333333]">
                 <div class="p-2 rounded-lg flex flex-col justify-center min-h-[500px]" style="background-color: var(--bg-main);">
                     {% for graph in graphs %}
@@ -123,7 +141,6 @@
                             graphData.layout.font.color = "#aaaaaa";
                             graphData.layout.autosize = true;
                             
-                            // Correção: Plotly Express gera os dados de linha dentro de um Array/Lista
                             if (graphData.data && graphData.data.length > 0) {
                                 graphData.data[0].line = {
                                     color: "#d16b19",
