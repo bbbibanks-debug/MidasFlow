@@ -18,11 +18,12 @@ DATA_STORE = {
     'tables_data_c': None,
     'tables_data_r': None,
     'tables_data_d': None,
+    'tables_data_p': None,
     'graphs': []
 }
 
 def formatar_numero_terminal(valor):
-    """Aplica formatação monetária com duas casas após a vírgula."""
+    """Aplica formatação de mercado com duas casas após a vírgula."""
     if isinstance(valor, (int, float, np.number)):
         if np.isnan(valor):
             return "—"
@@ -31,19 +32,21 @@ def formatar_numero_terminal(valor):
     return str(valor)
 
 def processar_metricas_lista(df, col):
-    """Calcula as 31 métricas quantitativas sob demanda."""
+    """Calcula as 43 métricas quantitativas completas sob demanda."""
     col_data = df[col].dropna()
     if col_data.empty:
-        return [], [], []
+        return [], [], [], []
         
     valores = col_data.to_numpy()
     n = len(valores)
     
-    # MEDIDAS CLÁSSICAS
+    # -------------------------------------------------------------
+    # 01. MEDIDAS CLÁSSICAS
+    # -------------------------------------------------------------
     m_aritmetica = np.mean(valores)
     mediana = np.median(valores)
     moda_res = stats.mode(valores, keepdims=True)
-    moda = moda_res.mode if len(moda_res.mode) > 0 else "—"
+    moda = moda_res.mode[0] if len(moda_res.mode) > 0 else "—"
     ponto_medio = (np.max(valores) + np.min(valores)) / 2
     
     try:
@@ -59,7 +62,9 @@ def processar_metricas_lista(df, col):
     m_quadratica = np.sqrt(np.mean(valores**2))
     m_cubica = np.cbrt(np.mean(valores**3))
     
-    # MEDIDAS ROBUSTAS E MODIFICADAS
+    # -------------------------------------------------------------
+    # 02. MEDIDAS ROBUSTAS E MODIFICADAS
+    # -------------------------------------------------------------
     m_aparada = stats.trim_mean(valores, proportiontocut=0.10)
     valores_winsor = stats.mstats.winsorize(valores, limits=[0.05, 0.05]).compressed()
     m_winsorizada = np.mean(valores_winsor)
@@ -76,7 +81,7 @@ def processar_metricas_lista(df, col):
     pesos = np.arange(1, n + 1)
     valores_ordenados = np.sort(valores)
     m_ponderada_pop = np.average(valores_ordenados, weights=pesos)
-
+    
     try:
         m_geo_winsor = stats.gmean(valores_winsor) if np.all(valores_winsor > 0) else "REQUER VALORES > 0"
     except Exception:
@@ -94,8 +99,9 @@ def processar_metricas_lista(df, col):
         moda_geometrica = amostras_kde[np.argmax(kde(amostras_kde))]
     except Exception:
         moda_geometrica = m_aritmetica
-
-    # MEDIDAS DE DISPERSÃO ABSOLUTA
+    # -------------------------------------------------------------
+    # 03. MEDIDAS DE DISPERSÃO ABSOLUTA
+    # -------------------------------------------------------------
     v_populacional = np.var(valores)
     v_amostral = np.var(valores, ddof=1) if n > 1 else np.nan
     dp_populacional = np.sqrt(v_populacional)
@@ -108,7 +114,7 @@ def processar_metricas_lista(df, col):
     amplitude_semi_iqr = iqr / 2
     
     mad = np.mean(np.abs(valores - m_aritmetica))
-    max_ad = np.median(np.abs(valores - mediana))
+    med_ad = np.median(np.abs(valores - mediana))
     
     dp_winsorizado = np.std(valores_winsor)
     dp_aparado = np.std(valores_aparados)
@@ -132,6 +138,36 @@ def processar_metricas_lista(df, col):
     else:
         var_geom, dp_geometrico = "REQUER VALORES > 0", "REQUER VALORES > 0"
 
+    # -------------------------------------------------------------
+    # 04. MEDIDAS DE DISPERSÃO RELATIVA E PADRONIZADA (NOVAS)
+    # -------------------------------------------------------------
+    cv = (dp_amostral / m_aritmetica) if m_aritmetica != 0 else np.nan
+    var_relativa = cv ** 2 if not np.isnan(cv) else np.nan
+    
+    epm = stats.sem(valores) if n > 1 else np.nan
+    ep_mediana = (1.2533 * epm) if not np.isnan(epm) else np.nan
+    ep_dp = (dp_amostral / np.sqrt(2 * n)) if n > 1 else np.nan
+    
+    ep_assimetria = np.sqrt((6 * n * (n - 1)) / ((n - 2) * (n + 1) * (n + 3))) if n > 2 else np.nan
+    ep_curtose = np.sqrt((24 * n * (n - 1) ** 2) / ((n - 3) * (n - 2) * (n + 3) * (n + 5))) if n > 3 else np.nan
+    
+    p10 = np.percentile(valores, 10)
+    p90 = np.percentile(valores, 90)
+    amp_percentil_rel = ((p90 - p10) / mediana) if mediana != 0 else np.nan
+    
+    coef_disp_mediana = (med_ad / mediana) if mediana != 0 else np.nan
+    coef_disp_quartil = (iqr / (q3 + q1)) if (q3 + q1) != 0 else np.nan
+    
+    # Processamento agregado dos escores pontuais (Média / Desvio Padrão)
+    if dp_amostral > 0:
+        z_scores = (valores - m_aritmetica) / dp_amostral
+        t_scores = (z_scores * 10) + 50
+        z_score_avg = np.mean(np.abs(z_scores))
+        t_score_avg = np.mean(t_scores)
+    else:
+        z_score_avg, t_score_avg = np.nan, np.nan
+
+    # Pacotes de Interface para Renderização Dinâmica
     metricas_c = ["Média Aritmética", "Mediana", "Moda", "Ponto Médio", "Média Geométrica", "Média Harmônica", "Média Quadrática", "Média Cúbica"]
     valores_c = [m_aritmetica, mediana, moda, ponto_medio, m_geometrica, m_harmonica, m_quadratica, m_cubica]
     data_c = [{"name": m, "value": formatar_numero_terminal(v)} for m, v in zip(metricas_c, valores_c)]
@@ -149,12 +185,25 @@ def processar_metricas_lista(df, col):
     valores_d = [
         v_populacional, v_amostral, dp_populacional, dp_amostral,
         amplitude_total, iqr, amplitude_semi_iqr, mad,
-        max_ad, dp_winsorizado, dp_aparado, gini_diff_media,
+        med_ad, dp_winsorizado, dp_aparado, gini_diff_media,
         media_amp_amostras, var_geom, dp_geometrico
     ]
     data_d = [{"name": m, "value": formatar_numero_terminal(v)} for m, v in zip(metricas_d, valores_d)]
     
-    return data_c, data_r, data_d
+    metricas_p = [
+        "Coeficiente de Variação (CV)", "Variância Relativa", "Escore-Z Médio Absoluto", "Escore-T Médio",
+        "Erro Padrão da Média (EPM)", "Erro Padrão da Mediana", "Erro Padrão do Desvio Padrão",
+        "Erro Padrão da Assimetria", "Erro Padrão da Curtose", "Amplitude Percentílica Relativa",
+        "Coef. Dispersão da Mediana", "Coef. Dispersão Quartílica"
+    ]
+    valores_p = [
+        cv, var_relativa, z_score_avg, t_score_avg,
+        epm, ep_mediana, ep_dp, ep_assimetria, ep_curtose,
+        amp_percentil_rel, coef_disp_mediana, coef_disp_quartil
+    ]
+    data_p = [{"name": m, "value": formatar_numero_terminal(v)} for m, v in zip(metricas_p, valores_p)]
+    
+    return data_c, data_r, data_d, data_p
 
 @app.route('/', methods=['GET'])
 def home():
@@ -163,6 +212,7 @@ def home():
         tables_data_c=DATA_STORE['tables_data_c'], 
         tables_data_r=DATA_STORE['tables_data_r'], 
         tables_data_d=DATA_STORE['tables_data_d'], 
+        tables_data_p=DATA_STORE['tables_data_p'], 
         graphs=DATA_STORE['graphs'], 
         columns=DATA_STORE['columns'], 
         selected_var=DATA_STORE['selected_var']
@@ -181,6 +231,7 @@ def handle_post():
                 DATA_STORE['tables_data_c'] = None
                 DATA_STORE['tables_data_r'] = None
                 DATA_STORE['tables_data_d'] = None
+                DATA_STORE['tables_data_p'] = None
                 DATA_STORE['graphs'] = []
                 DATA_STORE['selected_var'] = None
         except Exception:
@@ -191,10 +242,11 @@ def handle_post():
         if selected_var in df.columns:
             try:
                 DATA_STORE['selected_var'] = selected_var
-                dc, dr, dd = processar_metricas_lista(df, selected_var)
+                dc, dr, dd, dp = processar_metricas_lista(df, selected_var)
                 DATA_STORE['tables_data_c'] = dc
                 DATA_STORE['tables_data_r'] = dr
                 DATA_STORE['tables_data_d'] = dd
+                DATA_STORE['tables_data_p'] = dp
                 
                 fig = px.line(df, y=selected_var)
                 fig.update_layout(
@@ -219,6 +271,7 @@ def download_metrics():
     if DATA_STORE['tables_data_c']: todas_metricas.extend(DATA_STORE['tables_data_c'])
     if DATA_STORE['tables_data_r']: todas_metricas.extend(DATA_STORE['tables_data_r'])
     if DATA_STORE['tables_data_d']: todas_metricas.extend(DATA_STORE['tables_data_d'])
+    if DATA_STORE['tables_data_p']: todas_metricas.extend(DATA_STORE['tables_data_p'])
     
     export_df = pd.DataFrame(todas_metricas)
     export_df.columns = ['Métrica Estatística', 'Valor Calculado']
