@@ -111,20 +111,20 @@
 
             </div>
 
-            <!-- Coluna 2 (Direita): Contêiner com renderização assíncrona blindada -->
+            <!-- Coluna 2 (Direita): Contêiner Corrigido para Mapeamento em Array do Plotly -->
             <div class="card-panel p-4 flex flex-col sticky top-4 w-full bg-[#333333]">
                 <div class="p-2 rounded-lg flex flex-col justify-center min-h-[500px]" style="background-color: var(--bg-main);">
                     {% for graph in graphs %}
                     <div id="graph-panel-target" class="w-full h-[480px]"></div>
                     <script>
-                        // Blindagem assíncrona para garantir que o contêiner exista antes de plotar
                         requestAnimationFrame(function() {
                             var graphData = {{ graph|safe }};
                             graphData.layout.font.family = "Segoe UI";
                             graphData.layout.font.color = "#aaaaaa";
                             graphData.layout.autosize = true;
                             
-                            if(graphData.data && graphData.data[0]) {
+                            // Correção: Plotly Express gera os dados de linha dentro de um Array/Lista
+                            if (graphData.data && graphData.data.length > 0) {
                                 graphData.data[0].line = {
                                     color: "#d16b19",
                                     width: 2.5
