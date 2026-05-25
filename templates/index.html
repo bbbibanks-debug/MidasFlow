@@ -12,9 +12,16 @@
 
     <div class="w-full max-w-6xl dashboard-container p-6 md:p-8 flex flex-col overflow-hidden">
         
-        <!-- Topbar com Título Comercial Limpo -->
+        <!-- Topbar -->
         <div class="mb-6 flex justify-between items-center border-b border-[#555555] pb-4">
             <h1 class="text-white text-lg font-bold tracking-tight">MidasFlow <span class="text-xs font-mono font-normal text-zinc-400 ml-2">// BUSINESS_INTELLIGENCE_ENGINE</span></h1>
+            
+            <!-- Botão de Download Visível Apenas quando há Variável Ativa -->
+            {% if selected_var %}
+            <a href="/download-metrics" class="bg-[#d16b19] hover:bg-[#5c3a21] text-white text-xs font-semibold px-4 py-2 rounded transition-all flex items-center gap-2 border border-[#555555]">
+                📥 Exportar Métricas (Excel)
+            </a>
+            {% endif %}
         </div>
 
         <!-- Seção de Controles Superiores -->
@@ -51,36 +58,37 @@
             <!-- Coluna de Cards Retráteis -->
             <div class="lg:col-span-6 flex flex-col gap-4">
                 
-                <!-- Painel 01: Clássicas -->
+                <!-- Painel 01: Medidas Clássicas -->
                 <details class="card-panel group overflow-hidden">
                     <summary class="accordion-header">
-                        <span style="color: var(--text-main);">// 01. Medidas Clássicas</span>
+                        <span style="color: var(--text-main);">Medidas Clássicas</span>
                         <span class="text-[10px] transition-transform duration-200 group-open:rotate-180" style="color: var(--text-muted);">▼</span>
                     </summary>
                     <div class="accordion-content">
+                        <!-- Formatado em bloco vertical com margem controlada -->
                         <div class="grid grid-cols-2 gap-3">
                             {% for item in tables_data_c %}
-                            <div class="stat-box box-classic p-3 flex flex-col justify-between">
-                                <span class="text-[10px] font-medium truncate mb-1" style="color: var(--text-muted);">{{ item.name }}</span>
-                                <span class="text-xs font-bold font-mono tracking-tight" style="color: var(--text-main);">{{ item.value }}</span>
+                            <div class="stat-box box-classic p-3.5 flex flex-col gap-2.5">
+                                <span class="text-[10px] text-zinc-400 font-medium truncate">{{ item.name }}</span>
+                                <span class="text-sm font-bold text-white tracking-tight font-mono">{{ item.value }}</span>
                             </div>
                             {% endfor %}
                         </div>
                     </div>
                 </details>
 
-                <!-- Painel 02: Robustas -->
+                <!-- Painel 02: Medidas Robustas -->
                 <details class="card-panel group overflow-hidden">
                     <summary class="accordion-header">
-                        <span style="color: var(--text-main);">// 02. Medidas Robustas e Modificadas</span>
+                        <span style="color: var(--text-main);">Medidas Robustas e Modificadas</span>
                         <span class="text-[10px] transition-transform duration-200 group-open:rotate-180" style="color: var(--text-muted);">▼</span>
                     </summary>
                     <div class="accordion-content">
                         <div class="grid grid-cols-2 gap-3">
                             {% for item in tables_data_r %}
-                            <div class="stat-box box-robust p-3 flex flex-col justify-between">
-                                <span class="text-[10px] font-medium truncate mb-1" style="color: var(--text-muted);">{{ item.name }}</span>
-                                <span class="text-xs font-bold font-mono tracking-tight" style="color: var(--accent-gold);">{{ item.value }}</span>
+                            <div class="stat-box box-robust p-3.5 flex flex-col gap-2.5">
+                                <span class="text-[10px] text-zinc-400 font-medium truncate">{{ item.name }}</span>
+                                <span class="text-sm font-bold text-white tracking-tight font-mono" style="color: var(--accent-gold);">{{ item.value }}</span>
                             </div>
                             {% endfor %}
                         </div>
@@ -90,15 +98,15 @@
                 <!-- Painel 03: Dispersão Absoluta -->
                 <details class="card-panel group overflow-hidden" open>
                     <summary class="accordion-header">
-                        <span style="color: var(--text-main);">// 03. Medidas de Dispersão Absoluta</span>
+                        <span style="color: var(--text-main);">Medidas de Dispersão Absoluta</span>
                         <span class="text-[10px] transition-transform duration-200 group-open:rotate-180" style="color: var(--text-muted);">▼</span>
                     </summary>
                     <div class="accordion-content">
                         <div class="grid grid-cols-2 gap-3">
                             {% for item in tables_data_d %}
-                            <div class="stat-box box-dispersion p-3 flex flex-col justify-between">
-                                <span class="text-[10px] font-medium truncate mb-1" style="color: var(--text-muted);">{{ item.name }}</span>
-                                <span class="text-xs font-bold font-mono tracking-tight" style="color: var(--accent-orange);">{{ item.value }}</span>
+                            <div class="stat-box box-dispersion p-3.5 flex flex-col gap-2.5">
+                                <span class="text-[10px] text-zinc-400 font-medium truncate">{{ item.name }}</span>
+                                <span class="text-sm font-bold text-white tracking-tight font-mono" style="color: var(--accent-orange);">{{ item.value }}</span>
                             </div>
                             {% endfor %}
                         </div>
@@ -113,11 +121,10 @@
                     {% for graph in graphs %}
                     <div id="graph-{{ loop.index }}" class="w-full h-[520px]"></div>
                     <script>
-                        var graphData = {{ graph|safe }};
+                        var graphData = {{ graph|safe };
                         graphData.layout.font.family = "Segoe UI";
                         graphData.layout.font.color = "#aaaaaa";
                         if(graphData.data && graphData.data) {
-                            // Altera a linha do gráfico para o tom laranja queimado institucional da imagem
                             graphData.data.line = {
                                 color: "#d16b19",
                                 width: 2.5
