@@ -10,7 +10,7 @@ from flask import Flask, render_template, request, redirect, url_for, send_file
 
 app = Flask(__name__)
 
-# Estrutura de persistência interna unificada
+# Cache de dados estruturado para o padrão de redirecionamento Get
 DATA_STORE = {
     'df': None,
     'columns': [],
@@ -22,7 +22,7 @@ DATA_STORE = {
 }
 
 def formatar_numero_terminal(valor):
-    """Formata com precisão padrão do mercado: duas casas decimais e separadores brasileiros."""
+    """Aplica formatação monetária com duas casas após a vírgula."""
     if isinstance(valor, (int, float, np.number)):
         if np.isnan(valor):
             return "—"
@@ -31,7 +31,7 @@ def formatar_numero_terminal(valor):
     return str(valor)
 
 def processar_metricas_lista(df, col):
-    """Calcula as 31 métricas e extrai listas de dicionários para os componentes."""
+    """Calcula as 31 métricas quantitativas sob demanda."""
     col_data = df[col].dropna()
     if col_data.empty:
         return [], [], []
@@ -39,11 +39,11 @@ def processar_metricas_lista(df, col):
     valores = col_data.to_numpy()
     n = len(valores)
     
-    # BLOCO 01: MEDIDAS CLÁSSICAS
+    # MEDIDAS CLÁSSICAS
     m_aritmetica = np.mean(valores)
     mediana = np.median(valores)
     moda_res = stats.mode(valores, keepdims=True)
-    moda = moda_res.mode[0] if len(moda_res.mode) > 0 else "—"
+    moda = moda_res.mode if len(moda_res.mode) > 0 else "—"
     ponto_medio = (np.max(valores) + np.min(valores)) / 2
     
     try:
@@ -59,7 +59,7 @@ def processar_metricas_lista(df, col):
     m_quadratica = np.sqrt(np.mean(valores**2))
     m_cubica = np.cbrt(np.mean(valores**3))
     
-    # BLOCO 02: MEDIDAS ROBUSTAS E MODIFICADAS
+    # MEDIDAS ROBUSTAS E MODIFICADAS
     m_aparada = stats.trim_mean(valores, proportiontocut=0.10)
     valores_winsor = stats.mstats.winsorize(valores, limits=[0.05, 0.05]).compressed()
     m_winsorizada = np.mean(valores_winsor)
@@ -76,7 +76,7 @@ def processar_metricas_lista(df, col):
     pesos = np.arange(1, n + 1)
     valores_ordenados = np.sort(valores)
     m_ponderada_pop = np.average(valores_ordenados, weights=pesos)
-    
+
     try:
         m_geo_winsor = stats.gmean(valores_winsor) if np.all(valores_winsor > 0) else "REQUER VALORES > 0"
     except Exception:
@@ -95,19 +95,20 @@ def processar_metricas_lista(df, col):
     except Exception:
         moda_geometrica = m_aritmetica
 
-    # BLOCO 03: MEDIDAS DE DISPERSÃO ABSOLUTA
+    # MEDIDAS DE DISPERSÃO ABSOLUTA
     v_populacional = np.var(valores)
     v_amostral = np.var(valores, ddof=1) if n > 1 else np.nan
     dp_populacional = np.sqrt(v_populacional)
     dp_amostral = np.sqrt(v_amostral) if n > 1 else np.nan
     
     amplitude_total = np.max(valores) - np.min(valores)
-    q1, q3 = np.percentile(valores, [25, 75])
+    q1 = np.percentile(valores, 25)
+    q3 = np.percentile(valores, 75)
     iqr = q3 - q1
     amplitude_semi_iqr = iqr / 2
     
     mad = np.mean(np.abs(valores - m_aritmetica))
-    med_ad = np.median(np.abs(valores - mediana))
+    max_ad = np.median(np.abs(valores - mediana))
     
     dp_winsorizado = np.std(valores_winsor)
     dp_aparado = np.std(valores_aparados)
@@ -148,7 +149,7 @@ def processar_metricas_lista(df, col):
     valores_d = [
         v_populacional, v_amostral, dp_populacional, dp_amostral,
         amplitude_total, iqr, amplitude_semi_iqr, mad,
-        med_ad, dp_winsorizado, dp_aparado, gini_diff_media,
+        max_ad, dp_winsorizado, dp_aparado, gini_diff_media,
         media_amp_amostras, var_geom, dp_geometrico
     ]
     data_d = [{"name": m, "value": formatar_numero_terminal(v)} for m, v in zip(metricas_d, valores_d)]
@@ -174,7 +175,6 @@ def handle_post():
         try:
             df = pd.read_excel(file)
             num_cols = df.select_dtypes(include=[np.number]).columns.tolist()
-            
             if num_cols:
                 DATA_STORE['df'] = df
                 DATA_STORE['columns'] = num_cols
@@ -185,11 +185,9 @@ def handle_post():
                 DATA_STORE['selected_var'] = None
         except Exception:
             pass
-
     elif 'target_variable' in request.form and DATA_STORE['df'] is not None:
         df = DATA_STORE['df']
         selected_var = request.form.get('target_variable')
-        
         if selected_var in df.columns:
             try:
                 DATA_STORE['selected_var'] = selected_var
@@ -208,39 +206,28 @@ def handle_post():
                     xaxis=dict(gridcolor="#333333", linecolor="#555555", title=None),
                     yaxis=dict(gridcolor="#333333", linecolor="#555555", title=None)
                 )
-                
                 DATA_STORE['graphs'] = [json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)]
             except Exception:
                 pass
-
     return redirect(url_for('home'))
 
 @app.route('/download-metrics', methods=['GET'])
 def download_metrics():
-    """Gera um arquivo Excel estruturado com todas as métricas calculadas em memória."""
     if DATA_STORE['selected_var'] is None:
         return redirect(url_for('home'))
-        
     todas_metricas = []
-    if DATA_STORE['tables_data_c']:
-        todas_metricas.extend(DATA_STORE['tables_data_c'])
-    if DATA_STORE['tables_data_r']:
-        todas_metricas.extend(DATA_STORE['tables_data_r'])
-    if DATA_STORE['tables_data_d']:
-        todas_metricas.extend(DATA_STORE['tables_data_d'])
-        
-    # Converte para DataFrame do Pandas
+    if DATA_STORE['tables_data_c']: todas_metricas.extend(DATA_STORE['tables_data_c'])
+    if DATA_STORE['tables_data_r']: todas_metricas.extend(DATA_STORE['tables_data_r'])
+    if DATA_STORE['tables_data_d']: todas_metricas.extend(DATA_STORE['tables_data_d'])
+    
     export_df = pd.DataFrame(todas_metricas)
     export_df.columns = ['Métrica Estatística', 'Valor Calculado']
     
-    # Escreve o Excel em bytes virtuais
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         export_df.to_excel(writer, index=False, sheet_name='Summary_Metrics')
     output.seek(0)
-    
-    nome_arquivo = f"MidasFlow_Metrics_{DATA_STORE['selected_var']}.xlsx"
-    return send_file(output, as_attachment=True, download_name=nome_arquivo, mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    return send_file(output, as_attachment=True, download_name=f"MidasFlow_Metrics_{DATA_STORE['selected_var']}.xlsx", mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 if __name__ == '__main__':
     porta = int(os.environ.get("PORT", 5000))
