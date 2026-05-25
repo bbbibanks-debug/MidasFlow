@@ -47,91 +47,71 @@
             </div>
         </div>
 
-        <!-- Layout em Duas Colunas Lado a Lado (Estilo Dashboard Clean) -->
+        <!-- Layout em Duas Colunas Perfeitas Lado a Lado (50% / 50%) -->
         {% if tables_data_c or tables_data_r or tables_data_d or tables_data_p %}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start flex-1 w-full">
             
-            <!-- Coluna 1 (Esquerda): Painéis Brancos de Métricas -->
-            <div class="flex flex-col gap-4 w-full">
+            <!-- CONTÊINER ÚNICO À ESQUERDA: Agrupa absolutamente todas as medidas -->
+            <div class="card-panel p-6 flex flex-col gap-6 w-full max-h-[85vh] overflow-y-auto">
                 
-                <!-- Medidas Clássicas -->
-                <details class="card-panel group overflow-hidden">
-                    <summary class="accordion-header">
-                        <span>Medidas Clássicas</span>
-                        <span class="text-[10px] transition-transform duration-200 group-open:rotate-180 text-slate-400">▼</span>
-                    </summary>
-                    <div class="accordion-content">
-                        <div class="grid grid-cols-2 gap-3">
-                            {% for item in tables_data_c %}
-                            <div class="stat-box box-classic p-4 flex flex-col min-h-[96px]">
-                                <span class="text-[10px] text-slate-500 font-semibold leading-tight mb-2">{{ item.name }}</span>
-                                <div class="flex-1"></div>
-                                <span class="text-base font-bold text-slate-800 font-mono tracking-tight">{{ item.value }}</span>
-                            </div>
-                            {% endfor %}
+                <!-- Sub-bloco 01: Clássicas -->
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-[#4e73df] border-b border-slate-200 pb-2 mb-4">Medidas Clássicas</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        {% for item in tables_data_c %}
+                        <div class="stat-box box-classic p-4 flex flex-col min-h-[96px]">
+                            <span class="text-[10px] text-slate-500 font-semibold leading-tight mb-2">{{ item.name }}</span>
+                            <div class="flex-1"></div>
+                            <span class="text-base font-bold font-mono tracking-tight text-slate-800">{{ item.value }}</span>
                         </div>
+                        {% endfor %}
                     </div>
-                </details>
-                <!-- Medidas Robustas -->
-                <details class="card-panel group overflow-hidden">
-                    <summary class="accordion-header">
-                        <span>Medidas Robustas e Modificadas</span>
-                        <span class="text-[10px] transition-transform duration-200 group-open:rotate-180 text-slate-400">▼</span>
-                    </summary>
-                    <div class="accordion-content">
-                        <div class="grid grid-cols-2 gap-3">
-                            {% for item in tables_data_r %}
-                            <div class="stat-box box-robust p-4 flex flex-col min-h-[96px]">
-                                <span class="text-[10px] text-slate-500 font-semibold leading-tight mb-2">{{ item.name }}</span>
-                                <div class="flex-1"></div>
-                                <span class="text-base font-bold text-slate-800 font-mono tracking-tight" style="color: var(--pbi-pink);">{{ item.value }}</span>
-                            </div>
-                            {% endfor %}
+                </div>
+
+                <!-- Sub-bloco 02: Robustas -->
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-[#4e73df] border-b border-slate-200 pb-2 mb-4">Medidas Robustas e Modificadas</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        {% for item in tables_data_r %}
+                        <div class="stat-box box-classic p-4 flex flex-col min-h-[96px]">
+                            <span class="text-[10px] text-slate-500 font-semibold leading-tight mb-2">{{ item.name }}</span>
+                            <div class="flex-1"></div>
+                            <span class="text-base font-bold font-mono tracking-tight text-slate-800">{{ item.value }}</span>
                         </div>
+                        {% endfor %}
                     </div>
-                </details>
-
-                <!-- Dispersão Absoluta -->
-                <details class="card-panel group overflow-hidden" open>
-                    <summary class="accordion-header">
-                        <span>Medidas de Dispersão Absoluta</span>
-                        <span class="text-[10px] transition-transform duration-200 group-open:rotate-180 text-slate-400">▼</span>
-                    </summary>
-                    <div class="accordion-content">
-                        <div class="grid grid-cols-2 gap-3">
-                            {% for item in tables_data_d %}
-                            <div class="stat-box box-dispersion p-4 flex flex-col min-h-[96px]">
-                                <span class="text-[10px] text-slate-500 font-semibold leading-tight mb-2">{{ item.name }}</span>
-                                <div class="flex-1"></div>
-                                <span class="text-base font-bold text-slate-800 font-mono tracking-tight" style="color: var(--pbi-mint);">{{ item.value }}</span>
-                            </div>
-                            {% endfor %}
+                </div>
+                <!-- Sub-bloco 03: Dispersão Absoluta -->
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-[#4e73df] border-b border-slate-200 pb-2 mb-4">Medidas de Dispersão Absoluta</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        {% for item in tables_data_d %}
+                        <div class="stat-box box-classic p-4 flex flex-col min-h-[96px]">
+                            <span class="text-[10px] text-slate-500 font-semibold leading-tight mb-2">{{ item.name }}</span>
+                            <div class="flex-1"></div>
+                            <span class="text-base font-bold font-mono tracking-tight text-slate-800">{{ item.value }}</span>
                         </div>
+                        {% endfor %}
                     </div>
-                </details>
+                </div>
 
-                <!-- Dispersão Relativa e Padronizada -->
-                <details class="card-panel group overflow-hidden">
-                    <summary class="accordion-header">
-                        <span>Medidas de Dispersão Relativa e Padronizada</span>
-                        <span class="text-[10px] transition-transform duration-200 group-open:rotate-180 text-slate-400">▼</span>
-                    </summary>
-                    <div class="accordion-content">
-                        <div class="grid grid-cols-2 gap-3">
-                            {% for item in tables_data_p %}
-                            <div class="stat-box box-relative p-4 flex flex-col min-h-[96px]">
-                                <span class="text-[10px] text-slate-500 font-semibold leading-tight mb-2">{{ item.name }}</span>
-                                <div class="flex-1"></div>
-                                <span class="text-base font-bold text-slate-800 font-mono tracking-tight" style="color: var(--pbi-blue);">{{ item.value }}</span>
-                            </div>
-                            {% endfor %}
+                <!-- Sub-bloco 04: Dispersão Relativa -->
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-[#4e73df] border-b border-slate-200 pb-2 mb-4">Medidas de Dispersão Relativa e Padronizada</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        {% for item in tables_data_p %}
+                        <div class="stat-box box-classic p-4 flex flex-col min-h-[96px]">
+                            <span class="text-[10px] text-slate-500 font-semibold leading-tight mb-2">{{ item.name }}</span>
+                            <div class="flex-1"></div>
+                            <span class="text-base font-bold font-mono tracking-tight text-slate-800">{{ item.value }}</span>
                         </div>
+                        {% endfor %}
                     </div>
-                </details>
+                </div>
 
-            </div>
+            </div> <!-- FIM DO CONTÊINER ÚNICO -->
 
-            <!-- Coluna 2 (Direita): Painel do Gráfico Customizado (Fundo Branco Estilo PBI) -->
+            <!-- CONTÊINER À DIREITA: Painel do Gráfico Lateral -->
             <div class="card-panel p-5 flex flex-col sticky top-4 w-full">
                 <div class="p-2 rounded-xl flex flex-col justify-center min-h-[500px] bg-white">
                     {% for graph in graphs %}
@@ -139,21 +119,17 @@
                     <script>
                         requestAnimationFrame(function() {
                             var graphData = {{ graph|safe }};
-                            
-                            // Ajusta o gráfico Plotly para o tema claro do Power BI corporativo
                             graphData.layout.font.family = "Plus Jakarta Sans";
                             graphData.layout.font.color = "#333333";
                             graphData.layout.paper_bgcolor = "rgba(0,0,0,0)";
                             graphData.layout.plot_bgcolor = "rgba(0,0,0,0)";
                             graphData.layout.autosize = true;
                             
-                            // Ajusta as linhas de grade para um cinza bem sutil e claro
                             if (graphData.layout.xaxis) graphData.layout.xaxis.gridcolor = "#e3e6f0";
                             if (graphData.layout.yaxis) graphData.layout.yaxis.gridcolor = "#e3e6f0";
                             
                             if (graphData.data && graphData.data.length > 0) {
-                                // Altera a cor da linha principal para o roxo elétrico idêntico ao da imagem
-                                graphData.data[0].line = {
+                                graphData.data.line = {
                                     color: "#5c25d9",
                                     width: 3
                                 };
