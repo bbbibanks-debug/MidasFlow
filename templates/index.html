@@ -12,11 +12,10 @@
 
     <div class="w-full max-w-6xl dashboard-container p-6 md:p-8 flex flex-col overflow-hidden">
         
-        <!-- Topbar -->
+        <!-- Topbar e Botão de Exportação -->
         <div class="mb-6 flex justify-between items-center border-b border-[#555555] pb-4">
-            <h1 class="text-white text-lg font-bold tracking-tight">MidasFlow <span class="text-xs font-mono font-normal text-zinc-400 ml-2">// BUSINESS_INTELLIGENCE_ENGINE</span></h1>
+            <h1 class="text-white text-lg font-bold tracking-tight">MidasFlow</h1>
             
-            <!-- Botão de Download Visível Apenas quando há Variável Ativa -->
             {% if selected_var %}
             <a href="/download-metrics" class="bg-[#d16b19] hover:bg-[#5c3a21] text-white text-xs font-semibold px-4 py-2 rounded transition-all flex items-center gap-2 border border-[#555555]">
                 📥 Exportar Métricas (Excel)
@@ -24,10 +23,9 @@
             {% endif %}
         </div>
 
-        <!-- Seção de Controles Superiores -->
+        <!-- Formulários Superiores Integrados -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            
-            <!-- Widget de Upload -->
+            <!-- Widget de Upload Moderno -->
             <div class="card-panel p-4 flex flex-col justify-center">
                 <form action="/" method="POST" enctype="multipart/form-data" class="w-full">
                     <label class="drop-zone">
@@ -37,7 +35,7 @@
                 </form>
             </div>
 
-            <!-- Seletor de Variáveis -->
+            <!-- Seletor de Variável Alvo -->
             <div class="card-panel p-4 flex flex-col justify-center">
                 <form action="/" method="POST" class="w-full">
                     <label class="block text-[10px] uppercase font-bold tracking-wider mb-2" style="color: var(--text-muted);">Métrica/Coluna Ativa para Filtro</label>
@@ -51,33 +49,31 @@
             </div>
         </div>
 
-        <!-- Exibição dos Painéis Modulares -->
+        <!-- Exibição dos Painéis Modulares de Boxes -->
         {% if tables_data_c or tables_data_r or tables_data_d %}
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-1">
             
-            <!-- Coluna de Cards Retráteis -->
+            <!-- Coluna dos Cards Sanfonados -->
             <div class="lg:col-span-6 flex flex-col gap-4">
                 
-                <!-- Painel 01: Medidas Clássicas -->
+                <!-- Medidas Clássicas -->
                 <details class="card-panel group overflow-hidden">
                     <summary class="accordion-header">
                         <span style="color: var(--text-main);">Medidas Clássicas</span>
                         <span class="text-[10px] transition-transform duration-200 group-open:rotate-180" style="color: var(--text-muted);">▼</span>
                     </summary>
                     <div class="accordion-content">
-                        <!-- Formatado em bloco vertical com margem controlada -->
                         <div class="grid grid-cols-2 gap-3">
                             {% for item in tables_data_c %}
-                            <div class="stat-box box-classic p-3.5 flex flex-col gap-2.5">
+                            <div class="stat-box box-classic p-3.5 flex flex-col gap-2">
                                 <span class="text-[10px] text-zinc-400 font-medium truncate">{{ item.name }}</span>
-                                <span class="text-sm font-bold text-white tracking-tight font-mono">{{ item.value }}</span>
+                                <span class="text-sm font-bold text-white font-mono">{{ item.value }}</span>
                             </div>
                             {% endfor %}
                         </div>
                     </div>
                 </details>
-
-                <!-- Painel 02: Medidas Robustas -->
+                <!-- Medidas Robustas -->
                 <details class="card-panel group overflow-hidden">
                     <summary class="accordion-header">
                         <span style="color: var(--text-main);">Medidas Robustas e Modificadas</span>
@@ -86,16 +82,16 @@
                     <div class="accordion-content">
                         <div class="grid grid-cols-2 gap-3">
                             {% for item in tables_data_r %}
-                            <div class="stat-box box-robust p-3.5 flex flex-col gap-2.5">
+                            <div class="stat-box box-robust p-3.5 flex flex-col gap-2">
                                 <span class="text-[10px] text-zinc-400 font-medium truncate">{{ item.name }}</span>
-                                <span class="text-sm font-bold text-white tracking-tight font-mono" style="color: var(--accent-gold);">{{ item.value }}</span>
+                                <span class="text-sm font-bold tracking-tight font-mono" style="color: var(--accent-gold);">{{ item.value }}</span>
                             </div>
                             {% endfor %}
                         </div>
                     </div>
                 </details>
 
-                <!-- Painel 03: Dispersão Absoluta -->
+                <!-- Dispersão Absoluta -->
                 <details class="card-panel group overflow-hidden" open>
                     <summary class="accordion-header">
                         <span style="color: var(--text-main);">Medidas de Dispersão Absoluta</span>
@@ -104,9 +100,9 @@
                     <div class="accordion-content">
                         <div class="grid grid-cols-2 gap-3">
                             {% for item in tables_data_d %}
-                            <div class="stat-box box-dispersion p-3.5 flex flex-col gap-2.5">
+                            <div class="stat-box box-dispersion p-3.5 flex flex-col gap-2">
                                 <span class="text-[10px] text-zinc-400 font-medium truncate">{{ item.name }}</span>
-                                <span class="text-sm font-bold text-white tracking-tight font-mono" style="color: var(--accent-orange);">{{ item.value }}</span>
+                                <span class="text-sm font-bold tracking-tight font-mono" style="color: var(--accent-orange);">{{ item.value }}</span>
                             </div>
                             {% endfor %}
                         </div>
@@ -115,22 +111,22 @@
 
             </div>
 
-            <!-- Painel do Gráfico Lateral -->
+            <!-- Painel do Gráfico Linear de Alta Fidelidade -->
             <div class="lg:col-span-6 card-panel p-3 flex flex-col h-full sticky top-4">
                 <div class="p-2 rounded-xl flex-1 flex flex-col justify-center h-full min-h-[460px]" style="background-color: var(--bg-main);">
                     {% for graph in graphs %}
-                    <div id="graph-{{ loop.index }}" class="w-full h-[520px]"></div>
+                    <div id="graph-1" class="w-full h-[520px]"></div>
                     <script>
-                        var graphData = {{ graph|safe };
+                        var graphData = {{ graph|safe }};
                         graphData.layout.font.family = "Segoe UI";
                         graphData.layout.font.color = "#aaaaaa";
-                        if(graphData.data && graphData.data) {
-                            graphData.data.line = {
+                        if(graphData.data && graphData.data[0]) {
+                            graphData.data[0].line = {
                                 color: "#d16b19",
                                 width: 2.5
                             };
                         }
-                        Plotly.newPlot('graph-{{ loop.index }}', graphData.data, graphData.layout, {responsive: true, displayModeBar: false});
+                        Plotly.newPlot('graph-1', graphData.data, graphData.layout, {responsive: true, displayModeBar: false});
                     </script>
                     {% endfor %}
                 </div>
