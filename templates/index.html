@@ -10,25 +10,25 @@
 </head>
 <body class="p-4 md:p-8 min-h-screen flex items-center justify-center">
 
-    <div class="w-full max-w-7xl dashboard-container p-2 md:p-4 flex flex-col overflow-hidden">
+    <div class="w-full max-w-7xl dashboard-container p-6 md:p-8 flex flex-col overflow-hidden">
         
-        <!-- Topbar em Contraste com o Fundo Escuro do Topo -->
-        <div class="mb-6 flex justify-between items-center border-b border-slate-700 pb-4">
-            <h1 class="text-white text-xl font-bold tracking-tight">MidasFlow</h1>
+        <!-- Topbar com Identidade Visual de Luxo -->
+        <div class="mb-6 flex justify-between items-center border-b border-[#2c2212] pb-4">
+            <h1 class="text-[#c5a880] text-xl font-bold tracking-widest uppercase">MidasFlow</h1>
             
             {% if selected_var %}
-            <a href="/download-metrics" class="bg-[#5c25d9] hover:bg-[#461aa8] text-white text-xs font-semibold px-4 py-2 rounded-lg transition-all flex items-center gap-2 shadow-md">
-                📥 Exportar Métricas (Excel)
+            <a href="/download-metrics" class="bg-transparent hover:bg-[#c5a880] text-[#c5a880] hover:text-black text-xs font-semibold px-5 py-2 rounded transition-all flex items-center gap-2 border border-[#c5a880] tracking-wider uppercase font-serif">
+                📥 Exportar Métricas
             </a>
             {% endif %}
         </div>
 
-        <!-- Controles Superiores Flutuantes -->
+        <!-- Controles Superiores -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div class="card-panel p-4 flex flex-col justify-center">
                 <form action="/" method="POST" enctype="multipart/form-data" class="w-full">
                     <label class="drop-zone">
-                        <p class="text-[11px] text-slate-600 font-medium"><span class="text-[#5c25d9] font-bold">Carregar Planilha</span> ou arrastar arquivo de vendas</p>
+                        <p class="text-[12px] text-zinc-400 font-medium tracking-wide"><span class="text-[#c5a880] font-bold">Carregar Planilha</span> ou arrastar arquivo matriz</p>
                         <input type="file" name="file" accept=".xlsx, .xls" required class="hidden" onchange="this.form.submit()">
                     </label>
                 </form>
@@ -36,9 +36,9 @@
 
             <div class="card-panel p-4 flex flex-col justify-center">
                 <form action="/" method="POST" class="w-full">
-                    <label class="block text-[10px] uppercase font-bold tracking-wider mb-2 text-slate-500">Métrica/Coluna Ativa para Filtro</label>
-                    <select name="target_variable" required onchange="this.form.submit()" class="input-clean w-full p-3 rounded-lg text-xs font-semibold cursor-pointer text-slate-800">
-                        <option value="">-- SELECIONE A COLUNA DE DADOS --</option>
+                    <label class="block text-[10px] uppercase font-bold tracking-wider mb-2" style="color: var(--text-muted);">Métrica Ativa para Filtragem</label>
+                    <select name="target_variable" required onchange="this.form.submit()" class="input-clean w-full p-3 rounded text-xs font-semibold cursor-pointer text-white">
+                        <option value="">-- SELECIONE A COLUNA DE ATIVOS --</option>
                         {% for col in columns %}
                         <option value="{{ col }}" {% if col == selected_var %}selected{% endif %}>{{ col }}</option>
                         {% endfor %}
@@ -51,18 +51,18 @@
         {% if tables_data_c or tables_data_r or tables_data_d or tables_data_p %}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start flex-1 w-full">
             
-            <!-- CONTÊINER ÚNICO À ESQUERDA: Agrupa absolutamente todas as medidas -->
+            <!-- CONTÊINER ÚNICO À ESQUERDA: Preto e Ouro Metálico com Rolagem Interna -->
             <div class="card-panel p-6 flex flex-col gap-6 w-full max-h-[85vh] overflow-y-auto">
                 
                 <!-- Sub-bloco 01: Clássicas -->
                 <div>
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-[#4e73df] border-b border-slate-200 pb-2 mb-4">Medidas Clássicas</h3>
+                    <h3 class="text-[11px] font-bold uppercase tracking-widest text-[#c5a880] border-b border-[#2c2212] pb-2 mb-4">Medidas Clássicas</h3>
                     <div class="grid grid-cols-2 gap-3">
                         {% for item in tables_data_c %}
                         <div class="stat-box box-classic p-4 flex flex-col min-h-[96px]">
-                            <span class="text-[10px] text-slate-500 font-semibold leading-tight mb-2">{{ item.name }}</span>
+                            <span class="text-[11px] text-zinc-400 font-medium leading-tight mb-2 font-serif italic">{{ item.name }}</span>
                             <div class="flex-1"></div>
-                            <span class="text-base font-bold font-mono tracking-tight text-slate-800">{{ item.value }}</span>
+                            <span class="text-base font-bold font-mono tracking-tight text-[#e5c99e]">{{ item.value }}</span>
                         </div>
                         {% endfor %}
                     </div>
@@ -70,26 +70,26 @@
 
                 <!-- Sub-bloco 02: Robustas -->
                 <div>
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-[#4e73df] border-b border-slate-200 pb-2 mb-4">Medidas Robustas e Modificadas</h3>
+                    <h3 class="text-[11px] font-bold uppercase tracking-widest text-[#c5a880] border-b border-[#2c2212] pb-2 mb-4">Medidas Robustas e Modificadas</h3>
                     <div class="grid grid-cols-2 gap-3">
                         {% for item in tables_data_r %}
                         <div class="stat-box box-classic p-4 flex flex-col min-h-[96px]">
-                            <span class="text-[10px] text-slate-500 font-semibold leading-tight mb-2">{{ item.name }}</span>
+                            <span class="text-[11px] text-zinc-400 font-medium leading-tight mb-2 font-serif italic">{{ item.name }}</span>
                             <div class="flex-1"></div>
-                            <span class="text-base font-bold font-mono tracking-tight text-slate-800">{{ item.value }}</span>
+                            <span class="text-base font-bold font-mono tracking-tight text-[#e5c99e]">{{ item.value }}</span>
                         </div>
                         {% endfor %}
                     </div>
                 </div>
                 <!-- Sub-bloco 03: Dispersão Absoluta -->
                 <div>
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-[#4e73df] border-b border-slate-200 pb-2 mb-4">Medidas de Dispersão Absoluta</h3>
+                    <h3 class="text-[11px] font-bold uppercase tracking-widest text-[#c5a880] border-b border-[#2c2212] pb-2 mb-4">Medidas de Dispersão Absoluta</h3>
                     <div class="grid grid-cols-2 gap-3">
                         {% for item in tables_data_d %}
                         <div class="stat-box box-classic p-4 flex flex-col min-h-[96px]">
-                            <span class="text-[10px] text-slate-500 font-semibold leading-tight mb-2">{{ item.name }}</span>
+                            <span class="text-[11px] text-zinc-400 font-medium leading-tight mb-2 font-serif italic">{{ item.name }}</span>
                             <div class="flex-1"></div>
-                            <span class="text-base font-bold font-mono tracking-tight text-slate-800">{{ item.value }}</span>
+                            <span class="text-base font-bold font-mono tracking-tight text-[#e5c99e]">{{ item.value }}</span>
                         </div>
                         {% endfor %}
                     </div>
@@ -97,13 +97,13 @@
 
                 <!-- Sub-bloco 04: Dispersão Relativa -->
                 <div>
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-[#4e73df] border-b border-slate-200 pb-2 mb-4">Medidas de Dispersão Relativa e Padronizada</h3>
+                    <h3 class="text-[11px] font-bold uppercase tracking-widest text-[#c5a880] border-b border-[#2c2212] pb-2 mb-4">Medidas de Dispersão Relativa e Padronizada</h3>
                     <div class="grid grid-cols-2 gap-3">
                         {% for item in tables_data_p %}
                         <div class="stat-box box-classic p-4 flex flex-col min-h-[96px]">
-                            <span class="text-[10px] text-slate-500 font-semibold leading-tight mb-2">{{ item.name }}</span>
+                            <span class="text-[11px] text-zinc-400 font-medium leading-tight mb-2 font-serif italic">{{ item.name }}</span>
                             <div class="flex-1"></div>
-                            <span class="text-base font-bold font-mono tracking-tight text-slate-800">{{ item.value }}</span>
+                            <span class="text-base font-bold font-mono tracking-tight text-[#e5c99e]">{{ item.value }}</span>
                         </div>
                         {% endfor %}
                     </div>
@@ -111,27 +111,31 @@
 
             </div> <!-- FIM DO CONTÊINER ÚNICO -->
 
-            <!-- CONTÊINER À DIREITA: Painel do Gráfico Lateral -->
+            <!-- CONTÊINER À DIREITA: Painel do Gráfico Ajustado para o Tema Dourado -->
             <div class="card-panel p-5 flex flex-col sticky top-4 w-full">
-                <div class="p-2 rounded-xl flex flex-col justify-center min-h-[500px] bg-white">
+                <div class="p-2 rounded flex-1 flex flex-col justify-center min-h-[500px]" style="background-color: var(--bg-main);">
                     {% for graph in graphs %}
                     <div id="graph-panel-target" class="w-full h-[480px]"></div>
                     <script>
                         requestAnimationFrame(function() {
                             var graphData = {{ graph|safe }};
-                            graphData.layout.font.family = "Plus Jakarta Sans";
-                            graphData.layout.font.color = "#333333";
+                            
+                            // Ajusta o gráfico Plotly para a paleta elegante Dark & Gold
+                            graphData.layout.font.family = "Cormorant Garamond, serif";
+                            graphData.layout.font.color = "#c5a880";
                             graphData.layout.paper_bgcolor = "rgba(0,0,0,0)";
                             graphData.layout.plot_bgcolor = "rgba(0,0,0,0)";
                             graphData.layout.autosize = true;
                             
-                            if (graphData.layout.xaxis) graphData.layout.xaxis.gridcolor = "#e3e6f0";
-                            if (graphData.layout.yaxis) graphData.layout.yaxis.gridcolor = "#e3e6f0";
+                            // Linhas de grade sutis em tom bronze escuro
+                            if (graphData.layout.xaxis) graphData.layout.xaxis.gridcolor = "#231d13";
+                            if (graphData.layout.yaxis) graphData.layout.yaxis.gridcolor = "#231d13";
                             
                             if (graphData.data && graphData.data.length > 0) {
+                                // Altera a linha principal para o tom dourado metálico fosco
                                 graphData.data.line = {
-                                    color: "#5c25d9",
-                                    width: 3
+                                    color: "#c5a880",
+                                    width: 2.5
                                 };
                             }
                             Plotly.newPlot('graph-panel-target', graphData.data, graphData.layout, {responsive: true, displayModeBar: false});
